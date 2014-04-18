@@ -1,0 +1,11 @@
+ipch
+*.suo
+*.sdf
+*.skb
+*.pdb
+Debug
+examples/build
+source/Debug
+source/Release
+*.opensdf
+*.vcxproj.*
