@@ -4,16 +4,29 @@
 
 using std::string;
 
+
+
 class SketchupHelper
 {
 	mutable SUModelRef m_Model;
 
 	float m_Scale;
-	
 	string m_outputDir;
+	vector<string> m_Components;
 
-	string fromSUString(SUStringRef str);
+	SUTransformation m_Origin;
+
+	//Convert to std::string and release
+	string fromSUString(SUStringRef& str);
+
 	string materialName(SUMaterialRef);
+	string materialName(SUFaceRef);
+	string componentName(SUComponentDefinitionRef);
+	string componentInstanceName(SUComponentInstanceRef);
+	string componentInstanceType(SUComponentInstanceRef);
+
+
+	bool exportEntitiesGeometry(SUEntitiesRef, const string& filename);
 
 public:
 	SketchupHelper();
@@ -24,6 +37,7 @@ public:
 
 	void exportMaterials(const string& filename);
 
+	void proccessInstances();
 	/**
 		Export all of the faces as a single HULL file
 	*/

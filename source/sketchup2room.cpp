@@ -46,6 +46,8 @@ int main(int argc, char* argv[])
 	sketchup.exportMaterials(filename + ".mtl");
 	sketchup.exportHull(filename+".obj");
 
+	sketchup.proccessInstances();
+
 	if(outputHtml.length() != 0) {
 		sketchup.writeHtmlFile(outputHtml,filename);
 	}

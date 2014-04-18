@@ -24,7 +24,10 @@
 #include <slapi/model/material.h>
 #include <slapi/model/texture.h>
 #include <slapi/model/mesh_helper.h>
+#include <slapi/model/component_instance.h>
+#include <slapi/model/component_definition.h>
 
+#include <map>
 #include <vector>
 #include <iostream>
 using namespace std;
