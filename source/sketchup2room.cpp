@@ -2,8 +2,20 @@
 //
 
 #include "stdafx.h"
-#include "SketchupHelper.h"
 
+#include "SketchupHelper.h"
+#include "HtmlWriter.h"
+#include "ModelWriter.h"
+
+string currentDir() {
+	char buffer[500];
+	GetCurrentDirectoryA(500,buffer);
+	return buffer;
+}
+
+void makeDir(string dir) {
+	CreateDirectoryA(dir.c_str(),NULL);
+}
 
 
 int main(int argc, char* argv[])
@@ -17,16 +29,21 @@ int main(int argc, char* argv[])
 		return 1;
 	}
 
-	SketchupHelper sketchup;
+	SUInitialize();
+
 
 	string outputHtml;
+	string outputDir = currentDir();
 
 	for(int i=1; i < argc-1; i++){
 		char* arg = argv[i];
 
-		if(stricmp("--out",arg) == 0){
-			sketchup.setOutputDir(argv[++i]);
-		} else if(stricmp("--html",arg) == 0) {
+		if(_stricmp("--out",arg) == 0){
+			
+			outputDir = currentDir() + "/" + string(argv[++i]) + "/";
+			makeDir(outputDir);
+
+		} else if(_stricmp("--html",arg) == 0) {
 			outputHtml = argv[++i];
 		} else {
 			cerr << "Unknown option: " << arg << endl;
@@ -36,24 +53,26 @@ int main(int argc, char* argv[])
 	
 	string filename = argv[argc-1];
 
-
-	if(!sketchup.openFile(filename)){
+	SUModelRef model = SketchupHelper::openFile(filename);
+	if(model.ptr == 0){
 		cout << "Could not read file" << endl;
 		return 1;
 	}
 	filename = filename.substr(0,filename.length()-4);
 	
-	sketchup.exportMaterials(filename + ".mtl");
-	sketchup.exportHull(filename+".obj");
 
-	sketchup.proccessInstances();
 
 	if(outputHtml.length() != 0) {
-		sketchup.writeHtmlFile(outputHtml,filename);
+		HtmlWriter writer(outputDir, filename);
+		writer.write(model);
 	}
 
+	
+	cout << "Writing world geometry" << endl;
+	ModelWriter hull(outputDir, filename);
+	hull.write(model);
 
+	ModelWriter::exportComponents(model, outputDir);
 
 	return 0;
 }
-

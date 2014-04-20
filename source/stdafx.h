@@ -7,6 +7,8 @@
 
 #include "targetver.h"
 
+
+
 #include <stdio.h>
 #include <tchar.h>
 
@@ -26,10 +28,18 @@
 #include <slapi/model/mesh_helper.h>
 #include <slapi/model/component_instance.h>
 #include <slapi/model/component_definition.h>
+#include <slapi/model/group.h>
+
 
 #include <map>
 #include <vector>
 #include <iostream>
+#include <fstream>
+#include <string>
+
 using namespace std;
+
+
+#include "Geometry.hpp"
 
 #define ASSERT(expr) assert(expr)

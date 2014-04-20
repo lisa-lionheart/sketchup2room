@@ -46,7 +46,7 @@
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>C:\Users\Lisa\Development\headers;$(IncludePath)</IncludePath>
     <LibraryPath>C:\Users\Lisa\Development\binaries\x86;$(LibraryPath)</LibraryPath>
-    <OutDir>$(SolutionDir)bin</OutDir>
+    <OutDir>$(SolutionDir)bin\</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -88,11 +88,16 @@
     <None Include="testlevel1.skp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Geometry.hpp" />
+    <ClInclude Include="HtmlWriter.h" />
+    <ClInclude Include="ModelWriter.h" />
     <ClInclude Include="SketchupHelper.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="HtmlWriter.cpp" />
+    <ClCompile Include="ModelWriter.cpp" />
     <ClCompile Include="sketchup2room.cpp" />
     <ClCompile Include="SketchupHelper.cpp" />
     <ClCompile Include="stdafx.cpp">
