@@ -1,10 +1,11 @@
-
 What is this?
 -------------
 
 A tool for creating VR "rooms" from google sketchup files
 
 [Check out the VR site](http://zion.vrsites.com/1/119)
+
+[Download](https://github.com/lisa-lionheart/sketchup2room/archive/v1.zip)
 
 Why?
 ----
