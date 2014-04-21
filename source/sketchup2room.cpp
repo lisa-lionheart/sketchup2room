@@ -33,22 +33,31 @@ int main(int argc, char* argv[])
 
 
 	string outputHtml;
+	string shader;
 	string outputDir = currentDir();
 
 	for(int i=1; i < argc-1; i++){
-		char* arg = argv[i];
+		string arg = argv[i];
 
-		if(_stricmp("--out",arg) == 0){
-			
+		if(arg == "--out"){
 			outputDir = currentDir() + "/" + string(argv[++i]) + "/";
 			makeDir(outputDir);
-
-		} else if(_stricmp("--html",arg) == 0) {
-			outputHtml = argv[++i];
-		} else {
-			cerr << "Unknown option: " << arg << endl;
-			return 1;
+			continue;
 		}
+		
+		if(arg == "--html") {
+			outputHtml = argv[++i];
+			continue;
+		}
+		
+		if(arg == "--shader") {
+			shader = argv[++i];
+			continue;
+		}
+
+		cerr << "Unknown option: " << arg << endl;
+		return 1;
+		
 	}
 	
 	string filename = argv[argc-1];
@@ -64,6 +73,9 @@ int main(int argc, char* argv[])
 
 	if(outputHtml.length() != 0) {
 		HtmlWriter writer(outputDir, filename);
+		if(!shader.empty()) {
+			writer.setDefaultShader(shader);
+		}
 		writer.write(model);
 	}
 

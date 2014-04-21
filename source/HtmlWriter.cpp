@@ -74,12 +74,17 @@ bool HtmlWriter::write(SUModelRef model) {
 	m_Html << "<Assets>" << endl;
 	m_Html << "<AssetObject id=\"hull\" src=\"" << m_FileName << ".obj\" mtl=\"" << m_FileName <<".mtl\" />" << endl;
 	
+	if(m_DefaultShader.length() != 0) {
+		m_Html << "<AssetShader id=\"default_shader_id\" src=\"" << m_DefaultShader << "\" />" << endl;
+
+	}
+
 	writeAssets(instances);
 
 	m_Html << "</Assets>" << endl;
 	m_Html << "<Room ";
 	writeTransform(m_Html,BaseTransform*m_Origin,true) << ">" << endl;
-	m_Html << "<Object id=\"hull\" collision_id=\"hull\" locked=\"true\" "<<BaseTransform<<" />" << endl;
+	m_Html << "<Object id=\"hull\" collision_id=\"hull\" "<<m_DefaultShaderId<<"locked=\"true\" "<<BaseTransform<<" />" << endl;
 	
 	for(size_t i=0; i < numInstances; i++) {
 		writeObject(instances[i]);
@@ -152,7 +157,7 @@ void HtmlWriter::writeObject(SUComponentInstanceRef obj) {
 	string type = SketchupHelper::componentInstanceType(obj);
 	
 	if(type[0] != '!'){
-		m_Html << "<Object id=\"" << type << "\" locked=\"true\" ";
+		m_Html << "<Object id=\"" << type << "\" "<<m_DefaultShaderId<<"locked=\"true\" ";
 		
 		if(name != "$nonsolid") {
 			m_Html << "collision_id=\"" << type <<"\" ";

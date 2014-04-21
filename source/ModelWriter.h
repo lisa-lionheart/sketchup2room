@@ -15,7 +15,8 @@ class ModelWriter
 	ofstream m_ObjFile;
 	ofstream m_MtlFile;
 
-	size_t m_VerticesUsed;
+	string m_CurrentMat;
+	size_t m_VerticesUsed, m_TexCoordsUsed;
 
 	map<void*,SUMeshHelperRef> m_MeshHelpers;
 	set<void*> m_Materials;
