@@ -1,8 +1,13 @@
 varying vec3 iPosition; //interpolated vertex position (note: not multiplied with model matrix, position is relative to object/model and not the room)
 varying vec3 iNormal; //interpolated normal 
 
+varying vec3 iPositionWorld; //interpolated vertex position (note: not multiplied with model matrix, position is relative to object/model and not the room)
+varying vec3 iNormalWorld; //interpolated normal 
+
 uniform gl_MaterialParameters gl_FrontMaterial;
 uniform sampler2D texDiffuse;
+
+uniform float iGlobalTime;
 
 int g_Debug = 0;
 
@@ -20,26 +25,41 @@ void applySceneLights();
 	range: How far to apply the light, saves GPU cycles
 
 */
-void applyPointLight(vec3 pos, vec3 colour, float near, float range) {
-	vec3 vec = pos - iPosition;
+void pointlight(vec3 pos, vec3 colour, float near, float range) {
+	vec3 vec = pos - iPositionWorld;
 	float dist = abs(length(vec));
 	
 	if(dist > range) {
 		return; //Out of range
 	}
 	
-	float tangent = dot(vec/dist,iNormal);
+	float tangent = dot(vec/dist,iNormalWorld);
 	if(tangent < 0.0f) {
 		return;	//Not facing light
 	}
 	
+	dist -= 1.0f;
 	dist -= near;
 	
-	float i = (1.0f / (dist*dist));
+	float i = clamp(1.0f / (dist*dist), 0.0f, 1.0f);
 	light += i * tangent * colour;
 }
 
-void applyFlashLight(vec3 colour) {
+float flicker(float offset) {
+	float t = offset + (iGlobalTime* 30);
+	return sin(t*0.2) * cos(t * 0.3) * sin(t * 0.4) ;
+}
+
+vec3 flickerPos(vec3 pos) {
+	float f=  flicker( pos.x+pos.y) * 0.2;
+	return pos + vec3(f,f,f);
+}
+
+void torchlight(vec3 pos, vec3 colour, float near, float range) {
+	pointlight(flickerPos(pos),colour, near, range); 
+}
+
+void flashlight(vec3 colour) {
 	
 	vec3 p = gl_ModelViewProjectionMatrix * vec4(iPosition,1.0);
 	
@@ -66,11 +86,4 @@ void main()
 			gl_FragColor = vec4(1,1,0,1);
 		}
 	}
-}
-
-//This will be generated
-void applySceneLights() {
-	applyFlashLight(  vec3(5.0, 5.0, 5.0) );
-
-//	applyPointLight( vec3(2.0, 2.0, 2.0), vec3(5.0, 0.0, 0.0), 0.0f,4.0f);
 }

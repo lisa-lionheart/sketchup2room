@@ -92,7 +92,7 @@ inline double length(const SUVector3D& v) {
 inline ostream& writeTransform(ostream& html, Transform t, bool flipYZ = false){
 	SUPoint3D pos = { 0 };
 
-	html << "pos=\""  << (pos * t)/ g_Scale << "\" "; 
+	html << "pos=\""  << (pos * t) / g_Scale << "\" "; 
 	html << "xdir=\"" << xaxis*t << "\" "; 
 
 	if(!flipYZ) {

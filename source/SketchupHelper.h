@@ -1,7 +1,24 @@
-#include "stdafx.h"
+#pragma once
+
+struct InstanceInfo {
+	SUComponentInstanceRef instance;
+	Transform transform;
+
+	
+	string modelName;
+	string modelId;
+
+	string type;
+	map<string,string> attributes;
+	string value;
+
+};
 
 class SketchupHelper
 {
+	
+	static bool parseInstanceName(const string& name, /*out*/ InstanceInfo& meta);
+
 public:
 
 	//Convert to std::string and released
@@ -16,6 +33,8 @@ public:
 
 	static bool isFrontFaceTextured(SUFaceRef);
 	static bool isBackFaceTextured(SUFaceRef);
+
+	static void getInstancesRecursive(SUEntitiesRef, /*out*/ vector<InstanceInfo>& results, Transform = BaseTransform);
 
 	static SUModelRef openFile(const string& filename);
 	

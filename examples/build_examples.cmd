@@ -3,7 +3,6 @@ set PATH=%PATH%;%CD%\..\bin
 rmdir build
 
 
-xcopy lighting.frag build
 sketchup2room --out build --shader lighting.frag --html lightingtest.html lightingtest.skp
 
 sketchup2room --out build --html stadium.html stadium.skp

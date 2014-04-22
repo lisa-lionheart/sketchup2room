@@ -1,11 +1,5 @@
 #pragma once
-
-struct InstanceMeta
-{
-	string type;
-	map<string,string> attributes;
-	string value; //Url
-};
+#include "SketchupHelper.h"
 
 
 class HtmlWriter
@@ -21,10 +15,8 @@ class HtmlWriter
 
 	string m_OutputDir;
 
-	void writeAssets(const vector<SUComponentInstanceRef>& instances);
-	void writeObject(SUComponentInstanceRef obj);
-
-	bool parseInstanceName(const string& name, /*out*/ InstanceMeta& meta);
+	void writeAssets(const vector<InstanceInfo>& instances);
+	void writeObject(const InstanceInfo& obj);
 
 public:
 	HtmlWriter(const string& outDir, const string& filename);
@@ -34,7 +26,7 @@ public:
 		m_DefaultShaderId = "shader_id=\"default_shader_id\" ";
 	}
 	
-	bool write(SUModelRef model);
+	bool write(const vector<InstanceInfo>& model);
 	
 	~HtmlWriter(void);
 };

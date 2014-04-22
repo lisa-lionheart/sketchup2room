@@ -6,6 +6,7 @@
 #include "SketchupHelper.h"
 #include "HtmlWriter.h"
 #include "ModelWriter.h"
+#include "ShaderWriter.h"
 
 string currentDir() {
 	char buffer[500];
@@ -62,6 +63,8 @@ int main(int argc, char* argv[])
 	
 	string filename = argv[argc-1];
 
+	cout << "Input file: " << filename << endl;
+
 	SUModelRef model = SketchupHelper::openFile(filename);
 	if(model.ptr == 0){
 		cout << "Could not read file" << endl;
@@ -69,14 +72,28 @@ int main(int argc, char* argv[])
 	}
 	filename = filename.substr(0,filename.length()-4);
 	
+	
+	// Get the entity container of the model.
+	SUEntitiesRef ents = SU_INVALID;
+	SUModelGetEntities(model, &ents);
 
+	vector<InstanceInfo> instances;
+	SketchupHelper::getInstancesRecursive(ents,instances);
+
+	cout << "Room contains " << instances.size() << " objects" << endl;
+
+	HtmlWriter writer(outputDir, filename);
+	if(!shader.empty()) {
+
+		cout << "Baking shaders :) " << endl;
+		writer.setDefaultShader("room_"+ filename+".frag");
+		
+		ShaderWriter shaderWriter(outputDir + "room_"+ filename+".frag", shader);
+		shaderWriter.writeLights(instances);
+	}
 
 	if(outputHtml.length() != 0) {
-		HtmlWriter writer(outputDir, filename);
-		if(!shader.empty()) {
-			writer.setDefaultShader(shader);
-		}
-		writer.write(model);
+		writer.write(instances);
 	}
 
 	
