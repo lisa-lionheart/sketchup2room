@@ -1,0 +1,306 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		4284ACFA1906654900EC2CFD /* HtmlWriter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4284ACF51906654900EC2CFD /* HtmlWriter.cpp */; };
+		4284ACFB1906654900EC2CFD /* ModelWriter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4284ACF61906654900EC2CFD /* ModelWriter.cpp */; };
+		4284ACFC1906654900EC2CFD /* sketchup2room.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4284ACF71906654900EC2CFD /* sketchup2room.cpp */; };
+		4284ACFD1906654900EC2CFD /* SketchupHelper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4284ACF81906654900EC2CFD /* SketchupHelper.cpp */; };
+		4284ACFE1906654900EC2CFD /* stdafx.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4284ACF91906654900EC2CFD /* stdafx.cpp */; };
+		4284AD041906684500EC2CFD /* FileFunctionsMac.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4284AD031906684500EC2CFD /* FileFunctionsMac.cpp */; };
+		4284AD1419086B1500EC2CFD /* ShaderWriter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4284AD1219086B1500EC2CFD /* ShaderWriter.cpp */; };
+		4284AD181909105300EC2CFD /* libSlapi.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 4284AD171909105300EC2CFD /* libSlapi.dylib */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		4284ACE1190664EA00EC2CFD /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		4284ACE3190664EA00EC2CFD /* sketchup2room */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = sketchup2room; sourceTree = BUILT_PRODUCTS_DIR; };
+		4284ACEF1906654900EC2CFD /* HtmlWriter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HtmlWriter.h; sourceTree = "<group>"; };
+		4284ACF01906654900EC2CFD /* ModelWriter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ModelWriter.h; sourceTree = "<group>"; };
+		4284ACF11906654900EC2CFD /* SketchupHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SketchupHelper.h; sourceTree = "<group>"; };
+		4284ACF21906654900EC2CFD /* stdafx.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stdafx.h; sourceTree = "<group>"; };
+		4284ACF41906654900EC2CFD /* Geometry.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Geometry.hpp; sourceTree = "<group>"; };
+		4284ACF51906654900EC2CFD /* HtmlWriter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = HtmlWriter.cpp; sourceTree = "<group>"; };
+		4284ACF61906654900EC2CFD /* ModelWriter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ModelWriter.cpp; sourceTree = "<group>"; };
+		4284ACF71906654900EC2CFD /* sketchup2room.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sketchup2room.cpp; sourceTree = "<group>"; };
+		4284ACF81906654900EC2CFD /* SketchupHelper.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SketchupHelper.cpp; sourceTree = "<group>"; };
+		4284ACF91906654900EC2CFD /* stdafx.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = stdafx.cpp; sourceTree = "<group>"; };
+		4284AD021906682400EC2CFD /* FileFunctions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FileFunctions.h; sourceTree = "<group>"; };
+		4284AD031906684500EC2CFD /* FileFunctionsMac.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FileFunctionsMac.cpp; sourceTree = "<group>"; };
+		4284AD051906688700EC2CFD /* FileFunctionsWin.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FileFunctionsWin.cpp; sourceTree = "<group>"; };
+		4284AD1019086A9B00EC2CFD /* slapi.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = slapi.framework; path = "../../../sdks/SketchUp-SDK-Mac/slapi.framework"; sourceTree = "<group>"; };
+		4284AD1219086B1500EC2CFD /* ShaderWriter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ShaderWriter.cpp; sourceTree = "<group>"; };
+		4284AD1319086B1500EC2CFD /* ShaderWriter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ShaderWriter.h; sourceTree = "<group>"; };
+		4284AD171909105300EC2CFD /* libSlapi.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libSlapi.dylib; path = ../bin/lib/libSlapi.dylib; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		4284ACE0190664EA00EC2CFD /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4284AD181909105300EC2CFD /* libSlapi.dylib in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		4284ACDA190664E900EC2CFD = {
+			isa = PBXGroup;
+			children = (
+				4284AD171909105300EC2CFD /* libSlapi.dylib */,
+				4284AD1019086A9B00EC2CFD /* slapi.framework */,
+				4284ACFF1906654F00EC2CFD /* source */,
+				4284ACE4190664EA00EC2CFD /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		4284ACE4190664EA00EC2CFD /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				4284ACE3190664EA00EC2CFD /* sketchup2room */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		4284ACFF1906654F00EC2CFD /* source */ = {
+			isa = PBXGroup;
+			children = (
+				4284AD1219086B1500EC2CFD /* ShaderWriter.cpp */,
+				4284AD1319086B1500EC2CFD /* ShaderWriter.h */,
+				4284ACEF1906654900EC2CFD /* HtmlWriter.h */,
+				4284ACF01906654900EC2CFD /* ModelWriter.h */,
+				4284ACF11906654900EC2CFD /* SketchupHelper.h */,
+				4284ACF21906654900EC2CFD /* stdafx.h */,
+				4284ACF41906654900EC2CFD /* Geometry.hpp */,
+				4284ACF51906654900EC2CFD /* HtmlWriter.cpp */,
+				4284ACF61906654900EC2CFD /* ModelWriter.cpp */,
+				4284ACF71906654900EC2CFD /* sketchup2room.cpp */,
+				4284ACF81906654900EC2CFD /* SketchupHelper.cpp */,
+				4284ACF91906654900EC2CFD /* stdafx.cpp */,
+				4284AD021906682400EC2CFD /* FileFunctions.h */,
+				4284AD031906684500EC2CFD /* FileFunctionsMac.cpp */,
+				4284AD051906688700EC2CFD /* FileFunctionsWin.cpp */,
+			);
+			name = source;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		4284ACE2190664EA00EC2CFD /* sketchup2room */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4284ACEC190664EA00EC2CFD /* Build configuration list for PBXNativeTarget "sketchup2room" */;
+			buildPhases = (
+				4284ACDF190664EA00EC2CFD /* Sources */,
+				4284ACE0190664EA00EC2CFD /* Frameworks */,
+				4284ACE1190664EA00EC2CFD /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = sketchup2room;
+			productName = sketchup2room;
+			productReference = 4284ACE3190664EA00EC2CFD /* sketchup2room */;
+			productType = "com.apple.product-type.tool";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		4284ACDB190664E900EC2CFD /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0510;
+				ORGANIZATIONNAME = "Lisa Croxford";
+			};
+			buildConfigurationList = 4284ACDE190664EA00EC2CFD /* Build configuration list for PBXProject "sketchup2room" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 4284ACDA190664E900EC2CFD;
+			productRefGroup = 4284ACE4190664EA00EC2CFD /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				4284ACE2190664EA00EC2CFD /* sketchup2room */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		4284ACDF190664EA00EC2CFD /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4284ACFB1906654900EC2CFD /* ModelWriter.cpp in Sources */,
+				4284ACFC1906654900EC2CFD /* sketchup2room.cpp in Sources */,
+				4284ACFD1906654900EC2CFD /* SketchupHelper.cpp in Sources */,
+				4284ACFA1906654900EC2CFD /* HtmlWriter.cpp in Sources */,
+				4284AD1419086B1500EC2CFD /* ShaderWriter.cpp in Sources */,
+				4284ACFE1906654900EC2CFD /* stdafx.cpp in Sources */,
+				4284AD041906684500EC2CFD /* FileFunctionsMac.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		4284ACEA190664EA00EC2CFD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		4284ACEB190664EA00EC2CFD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		4284ACED190664EA00EC2CFD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				CONFIGURATION_BUILD_DIR = "$(SRCROOT)/../bin";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"/Users/lisa/dev/sdks/SketchUp-SDK-Mac",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					/Users/lisa/dev/personal/sketchup2room/bin,
+					/Users/lisa/dev/personal/sketchup2room/bin/lib,
+				);
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				USER_HEADER_SEARCH_PATHS = "~/dev/sdks/SketchUp-SDK-Mac/slapi.framework/Headers";
+			};
+			name = Debug;
+		};
+		4284ACEE190664EA00EC2CFD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				CONFIGURATION_BUILD_DIR = "$(SRCROOT)/../bin";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"/Users/lisa/dev/sdks/SketchUp-SDK-Mac",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					/Users/lisa/dev/personal/sketchup2room/bin,
+					/Users/lisa/dev/personal/sketchup2room/bin/lib,
+				);
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				USER_HEADER_SEARCH_PATHS = "~/dev/sdks/SketchUp-SDK-Mac/slapi.framework/Headers";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		4284ACDE190664EA00EC2CFD /* Build configuration list for PBXProject "sketchup2room" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4284ACEA190664EA00EC2CFD /* Debug */,
+				4284ACEB190664EA00EC2CFD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		4284ACEC190664EA00EC2CFD /* Build configuration list for PBXNativeTarget "sketchup2room" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4284ACED190664EA00EC2CFD /* Debug */,
+				4284ACEE190664EA00EC2CFD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 4284ACDB190664E900EC2CFD /* Project object */;
+}

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>4BF5891E-B79C-480F-87F1-1DE6DC88A9AE</string>
+	<key>IDESourceControlProjectName</key>
+	<string>sketchup2room</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>DBE61254-388D-4269-92C7-8CE54C97F85A</key>
+		<string>ssh://github.com/lisa-lionheart/sketchup2room.git</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>sketchup2room/sketchup2room.xcodeproj/project.xcworkspace</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>DBE61254-388D-4269-92C7-8CE54C97F85A</key>
+		<string>../../..</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>ssh://github.com/lisa-lionheart/sketchup2room.git</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>110</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>DBE61254-388D-4269-92C7-8CE54C97F85A</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>DBE61254-388D-4269-92C7-8CE54C97F85A</string>
+			<key>IDESourceControlWCCName</key>
+			<string>sketchup2room</string>
+		</dict>
+	</array>
+</dict>
+</plist>
