@@ -1,6 +1,6 @@
 #pragma once
 #include "SketchupHelper.h"
-
+#include <set>
 
 class HtmlWriter
 {
@@ -10,6 +10,8 @@ class HtmlWriter
 
 	ofstream m_Html;
 	vector<string> m_Components;
+    
+    set<string> m_Assets;
 	
 	Transform m_Origin;
 
@@ -20,11 +22,10 @@ class HtmlWriter
 
 public:
 	HtmlWriter(const string& outDir, const string& filename);
+    
+    void addAsset(const string& assetTag);
 
-	void setDefaultShader(const string& s){ 
-		m_DefaultShader = s; 
-		m_DefaultShaderId = "shader_id=\"default_shader_id\" ";
-	}
+	void setDefaultShader(const string& s);
 	
 	bool write(const vector<InstanceInfo>& model);
 	

@@ -2,18 +2,7 @@
 #include "ModelWriter.h"
 #include "SketchupHelper.h"
 
-bool fileExists(const string& file)
-{
-   WIN32_FIND_DATAA FindFileData;
-   HANDLE handle = FindFirstFileA(file.c_str(), &FindFileData) ;
-   int found = handle != INVALID_HANDLE_VALUE;
-   if(found) 
-   {
-       FindClose(handle);
-	   return true;
-   }
-   return false;
-}
+
 
 ModelWriter::ModelWriter(const string& dir, const string& name)
 {
@@ -92,13 +81,6 @@ void ModelWriter::write(SUModelRef model)
 
 void ModelWriter::write(SUEntitiesRef ents, bool recursive)
 {
-	Transform baseTransform = {
-		-1, 0, 0, 0,
-		0, 0, 1, 0,
-		0, 1, 0, 0,
-		0, 0, 0, 1
-	};
-
 	cout << " - Gathering materials" << endl;
 	visitFaces(ents, &ModelWriter::gatherMaterials, recursive);
 	
@@ -307,53 +289,3 @@ void ModelWriter::writeFaces(SUFaceRef face, const Transform&){
 	}
 }
 
-
-void ModelWriter::exportComponents(SUModelRef model, const string& dir, bool overwrite) {
-	cout << "Exporting components from model" << endl;
-
-	SUEntitiesRef ents = SU_INVALID;
-	SUModelGetEntities(model,&ents);
-
-	// Get the entity container of the model
-	size_t numInstances =0;
-	SUEntitiesGetNumInstances(ents,&numInstances);
-
-	vector<SUComponentInstanceRef> instances(numInstances);
-	SUEntitiesGetInstances(ents,numInstances,instances.data(),&numInstances);
-
-	map<string,bool> foundComponents;
-
-	for(size_t i=0; i < numInstances; i++) {
-
-		string type = SketchupHelper::componentInstanceType(instances[i]);;
-
-		if(type[0] == '!') {
-			continue;
-		}
-
-		if(foundComponents[type] == false) {
-
-			if(fileExists(dir + type + ".obj") && !overwrite) {
-
-				cout << "File " << type << ".obj exists, skipping..." << endl;
-
-			} else {
-			
-				SUComponentDefinitionRef component = SU_INVALID;
-				SUComponentInstanceGetDefinition(instances[i],&component);
-
-				SUEntitiesRef entities = SU_INVALID;
-				SUComponentDefinitionGetEntities(component,&entities);
-
-				cout << "Writing component " << type << endl;
-				ModelWriter writer(dir,type);
-				writer.write(entities,true);
-
-			}
-
-			foundComponents[type] = true;
-		}
-	}
-
-	cout << "Done exporting components" << endl;
-}

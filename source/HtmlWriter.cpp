@@ -12,7 +12,7 @@ HtmlWriter::HtmlWriter(const string& outDir, const string& fileName)
 	m_OutputDir = outDir;
 	m_Origin = TransformIdentity;
 
-	m_Html.open(outDir + fileName + ".html");
+	m_Html.open(outDir + fileName);
 	m_Html.precision(3);
 	m_Html.setf( std::ios::fixed, std:: ios::floatfield );
 }
@@ -22,39 +22,41 @@ HtmlWriter::~HtmlWriter(void)
 {
 }
 
+void HtmlWriter::addAsset(const string &assetTag) {
+    m_Assets.insert(assetTag);
+}
 
+void HtmlWriter::setDefaultShader(const string &s) {
+    addAsset("<AssetShader id=\"default_shader_id\" " + s + "/>");
+    m_DefaultShaderId = "shader_id=\"default_shader_id\" ";
+}
 
 void HtmlWriter::writeAssets( const vector<InstanceInfo>& instances) {
 
-	map<string,bool> foundModels;
-
-
-	for(size_t i=0; i < instances.size(); i++) {
-
-		const InstanceInfo& inst = instances[i];
-
-		
-		//Placeholder components
-		if(inst.modelName[0] == '!'){
-			continue;
-		}
-		
-		if(inst.type == "origin") {
-			m_Origin = inst.transform;
-		}
-
-		if(foundModels[inst.modelName] == false) {
-			foundModels[inst.modelName] = true;
-			
-			cout << " - Found component: "  << inst.modelName << endl;
-			m_Html << "<AssetObject id=\""<< inst.modelId <<"\" src=\"" << inst.modelName << ".obj\" mtl=\"" << inst.modelName <<".mtl\" />" << endl;
-		}
-	}
+    
+    set<string>::iterator itr = m_Assets.begin();
+    while(itr != m_Assets.end()) {
+        
+        m_Html << *itr << endl;
+        
+        itr++;
+    }
 }
+
 
 
 bool HtmlWriter::write(const vector<InstanceInfo>& instances) {
 	
+    
+	for(size_t i=0; i < instances.size(); i++) {
+
+		const InstanceInfo& inst = instances[i];
+			
+		if(inst.type == "origin") {
+			m_Origin = inst.transform;
+		}
+    }
+    
 	cout << "Writing room HTML" << endl;
 
 
@@ -69,11 +71,6 @@ bool HtmlWriter::write(const vector<InstanceInfo>& instances) {
 	m_Html << "<Assets>" << endl;
 	m_Html << "<AssetObject id=\"hull\" src=\"" << m_FileName << ".obj\" mtl=\"" << m_FileName <<".mtl\" />" << endl;
 	
-	if(m_DefaultShader.length() != 0) {
-		m_Html << "<AssetShader id=\"default_shader_id\" src=\"" << m_DefaultShader << "\" />" << endl;
-
-	}
-
 	writeAssets(instances);
 
 	m_Html << "</Assets>" << endl;

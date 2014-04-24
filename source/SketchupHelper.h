@@ -35,6 +35,8 @@ public:
 	static bool isBackFaceTextured(SUFaceRef);
 
 	static void getInstancesRecursive(SUEntitiesRef, /*out*/ vector<InstanceInfo>& results, Transform = BaseTransform);
+    
+    static map<string,SUComponentDefinitionRef> getComponents(const vector<InstanceInfo>&);
 
 	static SUModelRef openFile(const string& filename);
 	

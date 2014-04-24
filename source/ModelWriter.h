@@ -41,8 +41,5 @@ public:
 
 	void write(SUEntitiesRef, bool recursive = false);
 	void write(SUModelRef);
-
-	static void exportComponents(SUModelRef, const string& dir, bool overwrite = false);
-
 };
 

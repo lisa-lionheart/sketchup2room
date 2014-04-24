@@ -86,7 +86,7 @@ inline ostream& operator<<(ostream& html, const SUPoint3D& v) {
 
 
 inline double length(const SUVector3D& v) {
-	return sqrt((v.x*v.x) + (v.y*v.y) + (v.z*v.z));
+	return sqrtf((v.x*v.x) + (v.y*v.y) + (v.z*v.z));
 }
 
 inline ostream& writeTransform(ostream& html, Transform t, bool flipYZ = false){

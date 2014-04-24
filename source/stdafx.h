@@ -5,12 +5,14 @@
 
 #pragma once
 
-#include "targetver.h"
-
-
-
 #include <stdio.h>
+
+#ifdef WIN32
 #include <tchar.h>
+#include <Windows.h>
+#else
+#include <math.h>
+#endif
 
 #include <assert.h>
 
@@ -40,6 +42,7 @@
 using namespace std;
 
 
+#include "FileFunctions.h"
 #include "Geometry.hpp"
 
 #define ASSERT(expr) assert(expr)

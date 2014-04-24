@@ -3,7 +3,7 @@
 #include "SketchupHelper.h"
 #include <fstream>
 
-#include <Windows.h>
+
 #include "Geometry.hpp"
 #include "ModelWriter.h"
 
@@ -48,7 +48,7 @@ string SketchupHelper::materialName(SUMaterialRef mat) {
 	
 	SUStringRef str = SU_INVALID;
 	SUStringCreate(&str);
-	SUResult res =SUMaterialGetName(mat,&str);
+	SUResult res = SUMaterialGetName(mat,&str);
 	if(res == SU_ERROR_NONE) {
 		string str2 = fromSUString(str);
 		for(size_t i=0; i < str2.length(); i++){
@@ -61,16 +61,14 @@ string SketchupHelper::materialName(SUMaterialRef mat) {
 	}
 
 
-	char buf[20];
-	_itoa_s((int)mat.ptr,buf,16);
-	return buf;
+    return "";
 }
 
 string SketchupHelper::getFrontFaceMaterialName(SUFaceRef face) {
 
 	SUMaterialRef mat = SU_INVALID;
 	SUFaceGetFrontMaterial(face,&mat);
-	if(mat.ptr == ""){
+	if(mat.ptr == 0){
 		return "";
 	}
 	return materialName(mat);
@@ -82,7 +80,7 @@ string SketchupHelper::getBackFaceMaterialName(SUFaceRef face) {
 	SUMaterialRef mat = SU_INVALID;
 	SUFaceGetBackMaterial(face,&mat);
 
-	if(mat.ptr == ""){
+	if(mat.ptr == 0){
 		return "";
 	}
 	return materialName(mat);
@@ -134,8 +132,7 @@ bool SketchupHelper::isBackFaceTextured(SUFaceRef face) {
 
 SUModelRef SketchupHelper::openFile(const string& filename) {
 	SUModelRef newModel = SU_INVALID;
-	SUResult res = SUModelCreateFromFile(&newModel, filename.c_str());
-
+	SUModelCreateFromFile(&newModel, filename.c_str());
 	return newModel;
 }
 
@@ -228,5 +225,17 @@ void SketchupHelper::getInstancesRecursive(SUEntitiesRef ents, vector<InstanceIn
 		getInstancesRecursive(ents,results, parentTransform*t);
 	}
 
+}
+
+map<string,SUComponentDefinitionRef> SketchupHelper::getComponents(const vector<InstanceInfo> &instances) {
+    map<string,SUComponentDefinitionRef> components;
+    
+    for(size_t i=0; i<instances.size();i++) {
+        SUComponentDefinitionRef def = SU_INVALID;
+        SUComponentInstanceGetDefinition(instances[i].instance, &def);
+        components[instances[i].modelName] = def;
+    }
+    
+    return components;
 }
 
