@@ -72,13 +72,6 @@ void ModelWriter::visitFaces(SUEntitiesRef ents, VisitorFunc func, bool recursiv
 	}
 }
 
-void ModelWriter::write(SUModelRef model)
-{
-	SUEntitiesRef ents = SU_INVALID;
-	SUModelGetEntities(model,&ents);
-	write(ents);
-}
-
 void ModelWriter::write(SUEntitiesRef ents, bool recursive)
 {
 	cout << " - Gathering materials" << endl;

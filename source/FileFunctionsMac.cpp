@@ -9,6 +9,7 @@
 #include "stdafx.h"
 #include <unistd.h>
 #include <sys/stat.h>
+#include <sys/kernel.h>
 
 string currentDir() {
     char buff[400];
@@ -24,4 +25,18 @@ bool fileExists(const string& str) {
     return (access( str.c_str(), F_OK ) != -1);
 }
 
+bool fileCopy(const string& src, const string& dest) {
+    
+    ifstream srcFile(src,ios_base::binary);
+    ofstream destFile(dest, ios_base::binary);
+    
+    char buffer[1024];
+    
+    while(!srcFile.eof()){
+        srcFile.read(buffer, 1024);
+        destFile.write(buffer,1024);
+    }
+    
+    return true;
+}
 

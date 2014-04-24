@@ -40,6 +40,5 @@ public:
 
 
 	void write(SUEntitiesRef, bool recursive = false);
-	void write(SUModelRef);
 };
 

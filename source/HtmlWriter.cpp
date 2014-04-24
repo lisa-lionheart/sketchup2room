@@ -7,6 +7,12 @@
 
 HtmlWriter::HtmlWriter(const string& outDir, const string& fileName)
 {
+    
+    
+    m_RoomAtributes["draw_glow"] = "false";
+    m_RoomAtributes["default_sounds"] = "false";
+    m_RoomAtributes["col"] = "0 0 0";
+    
 	m_Title = "Untitled";
 	m_FileName = fileName;
 	m_OutputDir = outDir;
@@ -74,7 +80,13 @@ bool HtmlWriter::write(const vector<InstanceInfo>& instances) {
 	writeAssets(instances);
 
 	m_Html << "</Assets>" << endl;
-	m_Html << "<Room draw_glow=\"false\" default_sounds=\"false\" col=\"0 0 0\" ";
+	m_Html << "<Room  ";
+    map<string,string>::iterator itr= m_RoomAtributes.begin();
+    while(itr != m_RoomAtributes.end()) {
+        m_Html << itr->first << "=\"" << itr->second << "\" ";
+        itr++;
+    }
+    
 	writeTransform(m_Html,m_Origin,true) << ">" << endl;
 	m_Html << "<Object id=\"hull\" collision_id=\"hull\" "<<m_DefaultShaderId<<"locked=\"true\" "<<BaseTransform<<" />" << endl;
 	
@@ -170,5 +182,9 @@ void HtmlWriter::writeObject(const InstanceInfo& _obj) {
 			m_Html << "</Paragraph>" << endl;
 		}
  	}
+    
+    if(obj.type == "sound") {
+        m_Html << "<Sound id=\"sound_" << baseName(obj.value) << "_id\" rect=\"-100 -100 100 100\" loop=\"true\" />" << endl;
+    }
 	
 }

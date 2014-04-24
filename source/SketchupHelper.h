@@ -16,11 +16,25 @@ struct InstanceInfo {
 
 class SketchupHelper
 {
+    SUModelRef m_Model;
+    vector<InstanceInfo> m_Instances;
+    map<string,SUComponentDefinitionRef> m_Components;
+    SUEntitiesRef m_TopLevelEnts;
 	
-	static bool parseInstanceName(const string& name, /*out*/ InstanceInfo& meta);
-
+	bool parseInstanceName(const string& name, /*out*/ InstanceInfo& meta);
+    
+	void getInstancesRecursive(SUEntitiesRef ents, Transform = BaseTransform);
+    void getComponents();
+    
 public:
-
+    SketchupHelper();
+    
+	bool openFile(const string& filename);
+    
+    vector<InstanceInfo>& instances(){ return m_Instances; }
+    map<string,SUComponentDefinitionRef>& components(){ return m_Components; }
+    SUEntitiesRef topLevelEntities(){ return m_TopLevelEnts; }
+    
 	//Convert to std::string and released
 	static string fromSUString(SUStringRef& str);
 	static string materialName(SUMaterialRef);
@@ -34,11 +48,7 @@ public:
 	static bool isFrontFaceTextured(SUFaceRef);
 	static bool isBackFaceTextured(SUFaceRef);
 
-	static void getInstancesRecursive(SUEntitiesRef, /*out*/ vector<InstanceInfo>& results, Transform = BaseTransform);
-    
-    static map<string,SUComponentDefinitionRef> getComponents(const vector<InstanceInfo>&);
 
-	static SUModelRef openFile(const string& filename);
 	
 	
 };

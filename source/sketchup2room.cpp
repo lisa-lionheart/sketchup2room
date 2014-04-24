@@ -8,6 +8,19 @@
 #include "ModelWriter.h"
 #include "ShaderWriter.h"
 
+
+string stringReplace(string in, string find, string replace) {
+    
+    while(true) {
+        size_t pos = in.find_first_of(find);
+        if(pos == -1)
+            break;
+        
+        in = in.substr(0,pos) + replace + in.substr(pos+find.length());
+    }
+    return in;
+}
+
 struct Config {
     string inputFile;
     string outputHtml;
@@ -15,6 +28,7 @@ struct Config {
     string ambientSound;
 	string shader;
 	string outputDir = currentDir();
+    string skyBox;
 };
 
 bool parseArguments(int argc, char* argv[], Config& config) {
@@ -38,10 +52,10 @@ bool parseArguments(int argc, char* argv[], Config& config) {
 			continue;
 		}
         
-        if(arg == "--ambientSound") {
-			config.ambientSound = argv[++i];
-            continue;
-        }
+        if(arg == "--skyBox") {
+			config.skyBox = argv[++i];
+			continue;
+		}
         
 		cerr << "Unknown option: " << arg << endl;
 		return true;
@@ -52,6 +66,9 @@ bool parseArguments(int argc, char* argv[], Config& config) {
     return false;
 }
 
+
+
+
 int main(int argc, char* argv[])
 {
 	if(argc < 2){
@@ -60,7 +77,6 @@ int main(int argc, char* argv[])
 		cerr << "Options:" << endl;
 		cerr << " --out <filename>          Set the output directory" << endl;
 		cerr << " --html <filename>         Generate a generic firebox HTML file" << endl;
-        cerr << " --ambientSound <filename> Ambient sound loop" << endl;
 		return 1;
 	}
 
@@ -69,39 +85,90 @@ int main(int argc, char* argv[])
     if(parseArguments(argc,argv,config)) {
         return 1;
     }
-
+    
+    SketchupHelper sketchup;
+    HtmlWriter htmlWriter(config.outputDir, config.outputHtml);
+	string roomName = config.inputFile.substr(0,config.inputFile.length()-4);
+    
 	cout << "Input file: " << config.inputFile << endl;
 
-	SUModelRef model = SketchupHelper::openFile(config.inputFile);
-	if(model.ptr == 0){
+	if(!sketchup.openFile(config.inputFile)){
 		cout << "Could not read file" << endl;
 		return 1;
 	}
     
     
-	HtmlWriter htmlWriter(config.outputDir, config.outputHtml);
-	SUEntitiesRef ents = SU_INVALID;
-	vector<InstanceInfo> instances;
+    set<string> assetsToCopy;
     
-	string roomName = config.inputFile.substr(0,config.inputFile.length()-4);
-	
-	// Get the entity container of the model.
-	SUModelGetEntities(model, &ents);
-	SketchupHelper::getInstancesRecursive(ents,instances);
+    if(!config.skyBox.empty()) {
+        
+        const char* directions[6] = {"up", "down", "left", "right", "front", "back"};
+        
+        for(int i = 0; i < 5;i++){
+            string f = stringReplace(config.skyBox,"$",directions[i]);
+            string id = "image_" + baseName(f) + "_id";
+            htmlWriter.setRoomAtributes(string("skybox_") + directions[i] + "_id", id);
+            htmlWriter.addAsset("<AssetImage id=\""+id+"\" src=\"" + fileName(f) + "\" />");
+            assetsToCopy.insert(f);
+        }
+        
+    }
+    
+	cout << "Room contains " << sketchup.instances().size() << " objects" << endl;
 
-	cout << "Room contains " << instances.size() << " objects" << endl;
+    cout << "Collecting external assets" << endl;
+    
+    for(int i=0; i < sketchup.instances().size();i++) {
+        
+        InstanceInfo& inst = sketchup.instances()[i];
+        if(inst.value == "" || inst.type=="link" || inst.type=="light") continue;
+        
+        if(inst.type == "sound") {
+            htmlWriter.addAsset("<AssetSound id=\"sound_"+baseName(inst.value)+"_id\" src=\""+fileName(inst.value)+"\" />");
+        }
+        
+        if(inst.value.substr(0,5) == "http:")
+            continue;
+        
+        assetsToCopy.insert(inst.value);
+        
+    }
+	
+    
+    
+    set<string>::iterator fileItr = assetsToCopy.begin();
+    while(fileItr != assetsToCopy.end()){
+        if(!fileExists(*fileItr)) {
+            cout << "Error file " << *fileItr << " could not be located";
+            return 1;
+        }
+        
+        string dest = config.outputDir+fileName(*fileItr);
+        if(fileExists(dest)) {
+            cout << "Skipping " << *fileItr << " already exists in output directory" << endl;
+            continue;
+        }
+        
+        cout << *fileItr << " -> " << dest << endl;
+        fileCopy(*fileItr, dest);
+        
+        if(fileExtension(*fileItr) == "obj") {
+            
+            //TODO: Copy materials and textures for object files
+        }
 
-	
-	
+        
+        fileItr++;
+    }
+
+    
 	cout << "Writing world geometry" << endl;
 	ModelWriter hull(config.outputDir, roomName);
-	hull.write(model);
+	hull.write(sketchup.topLevelEntities());
 
     cout << "Exporting geometry" << endl;
-    
-    map<string,SUComponentDefinitionRef> components = SketchupHelper::getComponents(instances);
-    map<string,SUComponentDefinitionRef>::iterator itr = components.begin();
-    while(itr != components.end()) {
+    map<string,SUComponentDefinitionRef>::iterator itr = sketchup.components().begin();
+    while(itr != sketchup.components().end()) {
         
         string componentName = itr->first;
         
@@ -115,7 +182,7 @@ int main(int argc, char* argv[])
         if(fileExists(config.outputDir + componentName + ".obj")) {
             cout << "File " << componentName << ".obj exists, skipping..." << endl;
         } else {
-			
+			SUEntitiesRef ents = SU_INVALID;
             SUComponentDefinitionGetEntities(itr->second,&ents);
             
             cout << "Writing component " << componentName << endl;
@@ -123,9 +190,7 @@ int main(int argc, char* argv[])
             writer.write(ents,true);
         }
         
-        
         itr++;
-        
     }
     
     if(!config.shader.empty()) {
@@ -133,11 +198,11 @@ int main(int argc, char* argv[])
 		htmlWriter.setDefaultShader("room_"+ roomName+".frag");
 		
 		ShaderWriter shaderWriter(config.outputDir + "room_"+ roomName+".frag", config.shader);
-		shaderWriter.writeLights(instances);
+		shaderWriter.writeLights(sketchup.instances());
     }
     
     if(!config.outputHtml.empty()) {
-		htmlWriter.write(instances);
+		htmlWriter.write(sketchup.instances());
 	}
 
 

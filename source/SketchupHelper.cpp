@@ -130,10 +130,25 @@ bool SketchupHelper::isBackFaceTextured(SUFaceRef face) {
 	return tex.ptr != 0;
 }
 
-SUModelRef SketchupHelper::openFile(const string& filename) {
-	SUModelRef newModel = SU_INVALID;
-	SUModelCreateFromFile(&newModel, filename.c_str());
-	return newModel;
+SketchupHelper::SketchupHelper(){
+    
+    m_Model.ptr = 0;
+    m_TopLevelEnts.ptr = 0;
+}
+
+bool SketchupHelper::openFile(const string& filename) {
+	SUResult res = SUModelCreateFromFile(&m_Model, filename.c_str());
+    if(res != SU_ERROR_NONE) {
+        return false;
+    }
+    
+    
+    cout << "- Processing file" << filename;
+    
+    SUModelGetEntities(m_Model, &m_TopLevelEnts);
+    getInstancesRecursive(m_TopLevelEnts);
+    getComponents();
+	return true;
 }
 
 
@@ -184,14 +199,14 @@ bool SketchupHelper::parseInstanceName(const string& name, InstanceInfo& meta) {
 	return true;
 }
 
-void SketchupHelper::getInstancesRecursive(SUEntitiesRef ents, vector<InstanceInfo>& results,Transform parentTransform) {
+void SketchupHelper::getInstancesRecursive(SUEntitiesRef ents, Transform parentTransform) {
 	
 	size_t count =0;
 	SUEntitiesGetNumInstances(ents,&count);
 	vector<SUComponentInstanceRef> instances(count);
 	SUEntitiesGetInstances(ents,count,instances.data(),&count);
 
-	results.reserve(results.size()+count);
+	m_Instances.reserve(m_Instances.size()+count);
 
 	for(size_t i =0; i < instances.size(); i++) {
 
@@ -208,7 +223,7 @@ void SketchupHelper::getInstancesRecursive(SUEntitiesRef ents, vector<InstanceIn
 
 		parseInstanceName(componentInstanceName(instances[i]),info);
 
-		results.push_back(info);
+		m_Instances.push_back(info);
 	}
 
 
@@ -222,20 +237,20 @@ void SketchupHelper::getInstancesRecursive(SUEntitiesRef ents, vector<InstanceIn
 
 		Transform t;
 		SUGroupGetTransform(groups[i],(SUTransformation*)&t);
-		getInstancesRecursive(ents,results, parentTransform*t);
+		getInstancesRecursive(ents, parentTransform*t);
 	}
 
 }
 
-map<string,SUComponentDefinitionRef> SketchupHelper::getComponents(const vector<InstanceInfo> &instances) {
-    map<string,SUComponentDefinitionRef> components;
+void SketchupHelper::getComponents() {
     
-    for(size_t i=0; i<instances.size();i++) {
+    for(size_t i=0; i< m_Instances.size();i++) {
         SUComponentDefinitionRef def = SU_INVALID;
-        SUComponentInstanceGetDefinition(instances[i].instance, &def);
-        components[instances[i].modelName] = def;
+        SUComponentInstanceGetDefinition(m_Instances[i].instance, &def);
+        
+        
+        
+        m_Components[m_Instances[i].modelName] = def;
     }
-    
-    return components;
 }
 

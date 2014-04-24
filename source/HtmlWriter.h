@@ -16,12 +16,16 @@ class HtmlWriter
 	Transform m_Origin;
 
 	string m_OutputDir;
+    
+    map<string,string> m_RoomAtributes;
 
 	void writeAssets(const vector<InstanceInfo>& instances);
 	void writeObject(const InstanceInfo& obj);
 
 public:
 	HtmlWriter(const string& outDir, const string& filename);
+    
+    void setRoomAtributes(const string& key, const string& value){ m_RoomAtributes[key] = value; }
     
     void addAsset(const string& assetTag);
 
