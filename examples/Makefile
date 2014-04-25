@@ -4,7 +4,7 @@ ODIR=build
 IN=$(basename $(wildcard *.skp))
 
 
-MK=../bin/sketchup2room.exe
+MK=../bin/sketchup2room$(exe)
 FLAGS=--out build 
 
 .SUFFIXES: .skp .html
@@ -12,7 +12,7 @@ FLAGS=--out build
 TARGETS = $(addprefix $(ODIR)/, $(addsuffix .html, $(IN)))
 
 all: $(TARGETS)
-	echo Done
+
 
 clean:
 	rm -Rf $(ODIR) 
