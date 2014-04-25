@@ -4,7 +4,7 @@ ODIR=build
 IN=$(basename $(wildcard *.skp))
 
 
-MK=sketchup2room
+MK=../bin/sketchup2room.exe
 FLAGS=--out build 
 
 .SUFFIXES: .skp .html

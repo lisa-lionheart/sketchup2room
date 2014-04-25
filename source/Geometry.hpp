@@ -77,11 +77,11 @@ inline SUVector3D operator*(const SUVector3D& a, const Transform& t) {
 }
 
 inline ostream& operator<<(ostream& html, const SUVector3D& v) {
-	return html << v.x << " " << v.y << " " << v.z << " ";
+	return html << v.x << " " << v.y << " " << v.z;
 }
 
 inline ostream& operator<<(ostream& html, const SUPoint3D& v) {
-	return html << v.x << " " << v.y << " " << v.z << " ";
+	return html << v.x << " " << v.y << " " << v.z;
 }
 
 

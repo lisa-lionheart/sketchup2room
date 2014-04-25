@@ -32,3 +32,17 @@ bool fileExists(const string& file)
     }
     return false;
 }
+bool fileCopy(const string& src, const string& dest) {
+    
+    ifstream srcFile(src,ios_base::binary);
+    ofstream destFile(dest, ios_base::binary);
+    
+    char buffer[1024];
+    
+    while(!srcFile.eof()){
+        srcFile.read(buffer, 1024);
+        destFile.write(buffer,1024);
+    }
+    
+    return true;
+}

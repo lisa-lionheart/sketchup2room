@@ -22,7 +22,7 @@ inline string fileName(const string& path) {
 inline string baseName(const string& path) {
     int i = path.find_last_of('/');
     int j = path.find_last_of('.');
-    return (i==-1) ? path.substr(0,j-i) : path.substr(i+1,j-i-1);
+    return (i==-1) ? path.substr(0,j) : path.substr(i+1,j-i-1);
 }
 
 

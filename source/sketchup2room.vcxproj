@@ -88,6 +88,7 @@
     <None Include="testlevel1.skp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="FileFunctions.h" />
     <ClInclude Include="Geometry.hpp" />
     <ClInclude Include="HtmlWriter.h" />
     <ClInclude Include="ModelWriter.h" />
@@ -97,6 +98,7 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="FileFunctionsWin.cpp" />
     <ClCompile Include="HtmlWriter.cpp" />
     <ClCompile Include="ModelWriter.cpp" />
     <ClCompile Include="ShaderWriter.cpp" />

@@ -33,7 +33,7 @@ void HtmlWriter::addAsset(const string &assetTag) {
 }
 
 void HtmlWriter::setDefaultShader(const string &s) {
-    addAsset("<AssetShader id=\"default_shader_id\" " + s + "/>");
+    addAsset("<AssetShader id=\"default_shader_id\" src=\"" + s + "\"/>");
     m_DefaultShaderId = "shader_id=\"default_shader_id\" ";
 }
 
@@ -75,7 +75,7 @@ bool HtmlWriter::write(const vector<InstanceInfo>& instances) {
 	m_Html << "<!--" << endl;
 	m_Html << "<FireBoxRoom>" << endl;
 	m_Html << "<Assets>" << endl;
-	m_Html << "<AssetObject id=\"hull\" src=\"" << m_FileName << ".obj\" mtl=\"" << m_FileName <<".mtl\" />" << endl;
+	m_Html << "<AssetObject id=\"object_hull\" src=\"" << baseName(m_FileName) << ".obj\" mtl=\"" << baseName(m_FileName) <<".mtl\" />" << endl;
 	
 	writeAssets(instances);
 
@@ -88,7 +88,7 @@ bool HtmlWriter::write(const vector<InstanceInfo>& instances) {
     }
     
 	writeTransform(m_Html,m_Origin,true) << ">" << endl;
-	m_Html << "<Object id=\"hull\" collision_id=\"hull\" "<<m_DefaultShaderId<<"locked=\"true\" "<<BaseTransform<<" />" << endl;
+	m_Html << "<Object id=\"object_hull\" collision_id=\"object_hull\" "<<m_DefaultShaderId<<"locked=\"true\" "<<BaseTransform<<" />" << endl;
 	
 	for(size_t i=0; i < instances.size(); i++) {
 		writeObject(instances[i]);
@@ -98,7 +98,7 @@ bool HtmlWriter::write(const vector<InstanceInfo>& instances) {
 	m_Html << "</FireBoxRoom>" << endl;
 	m_Html << "-->" << endl;
 	m_Html << "</body>" << endl;
-	m_Html << "</m_Html>" << endl;
+	m_Html << "</html>" << endl;
 
 	m_Html.close();
 

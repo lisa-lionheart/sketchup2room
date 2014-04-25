@@ -27,11 +27,13 @@ struct Config {
     
     string ambientSound;
 	string shader;
-	string outputDir = currentDir();
+	string outputDir; 
     string skyBox;
 };
 
 bool parseArguments(int argc, char* argv[], Config& config) {
+
+	config.outputDir = currentDir();
     
 	for(int i=1; i < argc-1; i++){
 		string arg = argv[i];
@@ -121,17 +123,18 @@ int main(int argc, char* argv[])
     for(int i=0; i < sketchup.instances().size();i++) {
         
         InstanceInfo& inst = sketchup.instances()[i];
-        if(inst.value == "" || inst.type=="link" || inst.type=="light") continue;
+        if(inst.value == "") continue;
         
-        if(inst.type == "sound") {
-            htmlWriter.addAsset("<AssetSound id=\"sound_"+baseName(inst.value)+"_id\" src=\""+fileName(inst.value)+"\" />");
-        }
+		if(inst.type == "sound" || inst.type == "image" ) {
+			if(inst.type == "sound") {
+				htmlWriter.addAsset("<AssetSound id=\"sound_"+baseName(inst.value)+"_id\" src=\""+fileName(inst.value)+"\" />");
+			}
         
-        if(inst.value.substr(0,5) == "http:")
-            continue;
+			if(inst.value.substr(0,5) == "http:")
+				continue;
         
-        assetsToCopy.insert(inst.value);
-        
+			assetsToCopy.insert(inst.value);
+		}
     }
 	
     
@@ -146,6 +149,7 @@ int main(int argc, char* argv[])
         string dest = config.outputDir+fileName(*fileItr);
         if(fileExists(dest)) {
             cout << "Skipping " << *fileItr << " already exists in output directory" << endl;
+			fileItr++;
             continue;
         }
         
