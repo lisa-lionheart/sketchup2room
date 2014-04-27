@@ -155,6 +155,9 @@ void HtmlWriter::writeObject(const InstanceInfo& _obj) {
 			m_Html << "<Paragraph ";
 		}
 
+		m_Html << m_DefaultShaderId;
+
+
 		if(obj.attributes["font_size"] != ""){
 			m_Html << "font_size=\""<<obj.attributes["font_size"]<<"\" ";
 		}

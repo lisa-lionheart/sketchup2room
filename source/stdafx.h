@@ -41,6 +41,17 @@
 
 using namespace std;
 
+inline string stringReplace(string in, string find, string replace) {
+    
+    while(true) {
+        size_t pos = in.find(find);
+        if(pos == -1)
+            break;
+        
+        in = in.substr(0,pos) + replace + in.substr(pos+find.length());
+    }
+    return in;
+}
 
 #include "FileFunctions.h"
 #include "Geometry.hpp"

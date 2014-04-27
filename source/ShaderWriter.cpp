@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "ShaderWriter.h"
 
+#include <sstream>
+
 ShaderWriter::ShaderWriter(const string& outFile, const string& inFile) {
 
 	m_Shader.open(outFile.c_str());
@@ -42,15 +44,33 @@ void ShaderWriter::writeLights(const vector<InstanceInfo>& instances) {
 			if(light.value != "") {
 				//Parse colour value
 
+				stringstream col(light.value);
+
+				col >> colour.x;
+				col >> colour.y;
+				col >> colour.z;
 			}
 
 			string func = "pointlight";
+
+			string posString;
+
+			stringstream ss;
+			ss << "vec3(" << pos.x << "," << pos.y << "," << pos.z << ")";
+			posString = ss.str();
 
 			if(light.attributes["func"] != "") {
 				func = light.attributes["func"];
 			}
 
-			m_Shader << func << "(vec3(" << pos.x << "," << pos.y << "," << pos.z << "),vec3(" << colour.x << "," << colour.y << "," << colour.z << "),0.00f,20.00f);" << endl;
+			if(light.attributes["cond"] != "") {
+
+				string cond = stringReplace(light.attributes["cond"],"$POS",posString);
+
+				m_Shader << "if(" << cond << ") ";
+			}
+
+			m_Shader << func << "(" << posString << ",vec3(" << colour.x << "," << colour.y << "," << colour.z << "),0.00f,20.00f);" << endl;
 		}
 
 	}

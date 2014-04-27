@@ -3,6 +3,7 @@ varying vec3 iNormal; //interpolated normal
 
 varying vec3 iPositionWorld; //interpolated vertex position (note: not multiplied with model matrix, position is relative to object/model and not the room)
 varying vec3 iNormalWorld; //interpolated normal 
+uniform vec3 iPlayerPosition; //the player's position in the room
 
 uniform gl_MaterialParameters gl_FrontMaterial;
 uniform sampler2D texDiffuse;
@@ -33,7 +34,7 @@ void pointlight(vec3 pos, vec3 colour, float near, float range) {
 		return; //Out of range
 	}
 	
-	float tangent = dot(vec/dist,iNormalWorld);
+	float tangent = dot(vec/dist,iNormalWorld/length(iNormalWorld));
 	if(tangent < 0.0f) {
 		return;	//Not facing light
 	}
@@ -59,6 +60,11 @@ void torchlight(vec3 pos, vec3 colour, float near, float range) {
 	pointlight(flickerPos(pos),colour, near, range); 
 }
 
+
+void ambient(vec3 pos, vec3 colour, float near, float range) {
+	light += colour;
+}
+
 void flashlight(vec3 colour) {
 	
 	vec3 p = gl_ModelViewProjectionMatrix * vec4(iPosition,1.0);
@@ -78,11 +84,14 @@ void main()
 	applySceneLights();
 	
 	vec4 diffuse = gl_FrontMaterial.diffuse;
-	diffuse *= texture2D(texDiffuse, gl_TexCoord[0].st);
+	if( gl_TexCoord[0].x != 9999.0f && gl_TexCoord[0].y != 9999.0f) {
+		diffuse *= texture2D(texDiffuse, gl_TexCoord[0].st);
+	}
+	
 	gl_FragColor = diffuse *  vec4(light,1.0);
 	
 	if(g_Debug) {
-		if(mod(iPosition.x+0.005,1.0) < 0.01 ||  mod(iPosition.y+0.005,1.0) < 0.01 || mod(iPosition.z+0.005,1.0) < 0.01) {
+		if(mod(iPositionWorld.x+0.005,1.0) < 0.01 ||  mod(iPositionWorld.y+0.005,1.0) < 0.01 || mod(iPositionWorld.z+0.005,1.0) < 0.01) {
 			gl_FragColor = vec4(1,1,0,1);
 		}
 	}

@@ -147,7 +147,6 @@ bool SketchupHelper::openFile(const string& filename) {
     
     SUModelGetEntities(m_Model, &m_TopLevelEnts);
     getInstancesRecursive(m_TopLevelEnts);
-    getComponents();
 	return true;
 }
 
@@ -170,7 +169,7 @@ bool SketchupHelper::parseInstanceName(const string& name, InstanceInfo& meta) {
 	meta.type = name.substr(1,firstPipe-1);
 	string value = name.substr(lastPipe+1);
 	
-	for(int i=0; i < value.length(); i++) {
+	for(size_t i=0; i < value.length(); i++) {
 		if(value[i] == '\\' && value[i+1] == 'n') {
 			value[i] = ' ';
 			value[i+1] = '\n';
@@ -219,9 +218,27 @@ void SketchupHelper::getInstancesRecursive(SUEntitiesRef ents, Transform parentT
 		info.transform = parentTransform*t;
 
 		info.modelName = componentInstanceType(instances[i]);
-		info.modelId = info.modelName + "_id";
+		info.modelId = "object_" + info.modelName;
+
+		
 
 		parseInstanceName(componentInstanceName(instances[i]),info);
+
+
+		if(info.modelName[0] == '$') {
+
+			string filename = info.modelName.substr(1);
+			info.modelName = baseName(filename);
+			info.modelId = "object_"+info.modelName;
+
+			m_Placeholders[info.modelName] = filename;
+		} else {
+
+			SUComponentDefinitionRef def = SU_INVALID;
+			SUComponentInstanceGetDefinition(info.instance, &def);
+        
+			m_Components[info.modelName] = def;
+		}
 
 		m_Instances.push_back(info);
 	}
@@ -240,17 +257,5 @@ void SketchupHelper::getInstancesRecursive(SUEntitiesRef ents, Transform parentT
 		getInstancesRecursive(ents, parentTransform*t);
 	}
 
-}
-
-void SketchupHelper::getComponents() {
-    
-    for(size_t i=0; i< m_Instances.size();i++) {
-        SUComponentDefinitionRef def = SU_INVALID;
-        SUComponentInstanceGetDefinition(m_Instances[i].instance, &def);
-        
-        
-        
-        m_Components[m_Instances[i].modelName] = def;
-    }
 }
 

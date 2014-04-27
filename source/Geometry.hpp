@@ -116,3 +116,12 @@ inline SUVector3D getTransformScale(const Transform& t) {
 	return scale;
 }
 
+inline bool operator==(const SUPoint3D& a, const SUPoint3D& b) {
+	return a.x==b.x && a.y == b.y && a.z == b.z;
+}
+
+inline bool operator==(const SUVector3D& a, const SUVector3D& b) {
+	return a.x==b.x && a.y == b.y && a.z == b.z;
+}
+
+
