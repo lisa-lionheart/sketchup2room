@@ -210,7 +210,6 @@ void ModelWriter::writeFace(SUMeshHelperRef mesh, const Transform& transform, bo
 	SUResult res = SUMeshHelperGetVertexIndices(mesh,triCount*3,indicies.data(),&gotIndices);
 	assert(res == SU_ERROR_NONE);
 
-	size_t i = 0;
 	SUPoint3D fakePoint = { 9999.0, 9999.0, 9999.0 };
 	size_t iFakePoint = getIndexedTex(fakePoint);
 

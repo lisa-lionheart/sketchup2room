@@ -29,7 +29,7 @@ class ModelWriter
 	string m_OutputDir;
 	
 	template<typename T>
-	inline size_t getOrInsert(vector<T>& vec, T& val) {
+	inline size_t getOrInsert(vector<T>& vec, const T& val) {
 		for(size_t i = 0; i<vec.size(); i++) {
 			if(vec[i] == val){
 				return i+1;
@@ -39,9 +39,12 @@ class ModelWriter
 		return vec.size();
 	}
 
-	size_t getIndexedPos( SUPoint3D& pos) { return getOrInsert(m_UniquePositions,pos); }
-	size_t getIndexedTex( SUPoint3D& pos) { return getOrInsert(m_UniqueTextures,pos); }
-	size_t getIndexedNormal( SUVector3D& pos) { return getOrInsert(m_UniqueNormals, pos / length(pos)); }
+	size_t getIndexedPos(const SUPoint3D& pos) { return getOrInsert<SUPoint3D>(m_UniquePositions,pos); }
+	size_t getIndexedTex(const SUPoint3D& pos) { return getOrInsert<SUPoint3D>(m_UniqueTextures,pos); }
+	size_t getIndexedNormal(const SUVector3D& normal) {
+        SUVector3D normalised = (normal / length(normal));
+        return getOrInsert<SUVector3D>(m_UniqueNormals, normalised);
+    }
 	
 
 	//Visting fucntions
