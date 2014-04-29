@@ -17,12 +17,25 @@ vec3 light = vec3(0,0,0);
 //Prototye for generated function
 void applySceneLights();
 
+
+// Util functions
+float flicker(float offset) {
+	float t = offset + (iGlobalTime* 30);
+	return sin(t*0.2) * cos(t * 0.3) * sin(t * 0.4) ;
+}
+
+vec3 flickerPos(vec3 pos) {
+	float f=  flicker( pos.x+pos.y) * 0.2;
+	return pos + vec3(f,f,f);
+}
+
+
 /*
 	Apply a point light base on the inverse square law
 	
 	pos:	Position of the light
 	colour: Colour and intensity
-	near: Size of the ight source, 0 for a point light
+	near: Size of the light source, 0 for a point light
 	range: How far to apply the light, saves GPU cycles
 
 */
@@ -46,25 +59,24 @@ void pointlight(vec3 pos, vec3 colour, float near, float range) {
 	light += i * tangent * colour;
 }
 
-float flicker(float offset) {
-	float t = offset + (iGlobalTime* 30);
-	return sin(t*0.2) * cos(t * 0.3) * sin(t * 0.4) ;
-}
-
-vec3 flickerPos(vec3 pos) {
-	float f=  flicker( pos.x+pos.y) * 0.2;
-	return pos + vec3(f,f,f);
-}
-
+/*
+	A point light but wiht a flickery effect
+	
+*/
 void torchlight(vec3 pos, vec3 colour, float near, float range) {
 	pointlight(flickerPos(pos),colour, near, range); 
 }
 
-
+/*
+	Set the global ambient level
+*/
 void ambient(vec3 pos, vec3 colour, float near, float range) {
 	light += colour;
 }
 
+/* 
+	Project a light pout of the players eyes
+*/
 void flashlight(vec3 colour) {
 	
 	vec3 p = gl_ModelViewProjectionMatrix * vec4(iPosition,1.0);
