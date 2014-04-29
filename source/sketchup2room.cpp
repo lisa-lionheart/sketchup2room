@@ -9,17 +9,7 @@
 #include "ShaderWriter.h"
 
 
-string stringReplace(string in, string find, string replace) {
-    
-    while(true) {
-        size_t pos = in.find_first_of(find);
-        if(pos == -1)
-            break;
-        
-        in = in.substr(0,pos) + replace + in.substr(pos+find.length());
-    }
-    return in;
-}
+
 
 struct Config {
     string inputFile;
@@ -29,11 +19,14 @@ struct Config {
 	string shader;
 	string outputDir; 
     string skyBox;
+
+	bool force;
 };
 
 bool parseArguments(int argc, char* argv[], Config& config) {
 
 	config.outputDir = currentDir();
+	config.force = false;
     
 	for(int i=1; i < argc-1; i++){
 		string arg = argv[i];
@@ -58,7 +51,11 @@ bool parseArguments(int argc, char* argv[], Config& config) {
 			config.skyBox = argv[++i];
 			continue;
 		}
-        
+		
+		if(arg == "--force") {
+			config.force = true;
+			continue;
+		}
 		cerr << "Unknown option: " << arg << endl;
 		return true;
 	}
@@ -106,7 +103,7 @@ int main(int argc, char* argv[])
         
         const char* directions[6] = {"up", "down", "left", "right", "front", "back"};
         
-        for(int i = 0; i < 5;i++){
+        for(int i = 0; i < 6;i++){
             string f = stringReplace(config.skyBox,"$",directions[i]);
             string id = "image_" + baseName(f) + "_id";
             htmlWriter.setRoomAtributes(string("skybox_") + directions[i] + "_id", id);
@@ -120,7 +117,7 @@ int main(int argc, char* argv[])
 
     cout << "Collecting external assets" << endl;
     
-    for(int i=0; i < sketchup.instances().size();i++) {
+    for(size_t i=0; i < sketchup.instances().size();i++) {
         
         InstanceInfo& inst = sketchup.instances()[i];
         if(inst.value == "") continue;
@@ -137,6 +134,24 @@ int main(int argc, char* argv[])
 		}
     }
 	
+	map<string,string>::iterator placeHolderItr = sketchup.placeholders().begin();
+	while(placeHolderItr != sketchup.placeholders().end()){
+		
+
+		string mtlFile = ModelWriter::getMaterialFile(placeHolderItr->second);
+
+		if(!mtlFile.empty()){
+			set<string> textures = ModelWriter::getTextures(mtlFile);
+			assetsToCopy.insert(textures.begin(),textures.end());
+		}
+
+		htmlWriter.addAsset("<AssetObject id=\"object_"+placeHolderItr->first+"\" src=\""+placeHolderItr->first+".obj\" mtl=\""+fileName(mtlFile)+"\" />");
+        
+		assetsToCopy.insert(mtlFile);
+		assetsToCopy.insert(placeHolderItr->second);
+
+		placeHolderItr++;
+	}
     
     
     set<string>::iterator fileItr = assetsToCopy.begin();
@@ -155,13 +170,7 @@ int main(int argc, char* argv[])
         
         cout << *fileItr << " -> " << dest << endl;
         fileCopy(*fileItr, dest);
-        
-        if(fileExtension(*fileItr) == "obj") {
-            
-            //TODO: Copy materials and textures for object files
-        }
-
-        
+          
         fileItr++;
     }
 
@@ -181,9 +190,9 @@ int main(int argc, char* argv[])
             continue;
 		}
         
-        htmlWriter.addAsset("<AssetObject id=\""+componentName+"_id\" src=\""+componentName+".obj\" mtl=\""+componentName+".mtl\" />");
+        htmlWriter.addAsset("<AssetObject id=\"object_"+componentName+"\" src=\""+componentName+".obj\" mtl=\""+componentName+".mtl\" />");
         
-        if(fileExists(config.outputDir + componentName + ".obj")) {
+		if(fileExists(config.outputDir + componentName + ".obj") && !config.force) {
             cout << "File " << componentName << ".obj exists, skipping..." << endl;
         } else {
 			SUEntitiesRef ents = SU_INVALID;
@@ -210,5 +219,5 @@ int main(int argc, char* argv[])
 	}
 
 
-	return 0;
+ 	return 0;
 }

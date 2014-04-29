@@ -18,13 +18,15 @@ class SketchupHelper
 {
     SUModelRef m_Model;
     vector<InstanceInfo> m_Instances;
-    map<string,SUComponentDefinitionRef> m_Components;
-    SUEntitiesRef m_TopLevelEnts;
+    
+	map<string,SUComponentDefinitionRef> m_Components;
+	map<string,string> m_Placeholders;
+
+	SUEntitiesRef m_TopLevelEnts;
 	
 	bool parseInstanceName(const string& name, /*out*/ InstanceInfo& meta);
     
 	void getInstancesRecursive(SUEntitiesRef ents, Transform = BaseTransform);
-    void getComponents();
     
 public:
     SketchupHelper();
@@ -33,6 +35,7 @@ public:
     
     vector<InstanceInfo>& instances(){ return m_Instances; }
     map<string,SUComponentDefinitionRef>& components(){ return m_Components; }
+    map<string,string>& placeholders(){ return m_Placeholders; }
     SUEntitiesRef topLevelEntities(){ return m_TopLevelEnts; }
     
 	//Convert to std::string and released

@@ -19,6 +19,11 @@ inline string fileName(const string& path) {
     return (i==-1) ? path : path.substr(i+1);
 }
 
+inline string dirName(const string& path) {
+    int i = path.find_last_of('/');
+    return (i==-1) ? path : path.substr(0,i+1);
+}
+
 inline string baseName(const string& path) {
     int i = path.find_last_of('/');
     int j = path.find_last_of('.');
