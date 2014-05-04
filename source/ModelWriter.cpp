@@ -120,10 +120,12 @@ void ModelWriter::write(SUEntitiesRef ents, bool recursive)
 		
 		m_MtlFile << "illium 4" << endl;
 
-		SUColor ambient;
-		SUMaterialGetColor(mat,&ambient);
+		SUColor ambient = {0};
 		m_MtlFile << "Ka " << (ambient.red / 255.0f) << " " << (ambient.green/255.0f) << " " << (ambient.blue/255.0f) << endl; 
-		m_MtlFile << "Kd " << (ambient.red / 255.0f) << " " << (ambient.green/255.0f) << " " << (ambient.blue/255.0f) << endl; 
+		
+		SUColor diffuse;
+		SUMaterialGetColor(mat,&diffuse);
+		m_MtlFile << "Kd " << (diffuse.red / 255.0f) << " " << (diffuse.green/255.0f) << " " << (diffuse.blue/255.0f) << endl; 
 		
 		if(ambient.alpha != 1.0) {
 			m_MtlFile << "d " << (ambient.alpha / 255.0f) << endl;
@@ -409,7 +411,12 @@ string ModelWriter::getMaterialFile(const string& objFile) {
 
 	ifstream file(objFile);
 
-	char buffer[300];
+	if(!file.good()) {
+		cerr << "Error examining file " << objFile;
+		exit(1);
+	}
+
+	char buffer[400];
 	while(!file.eof()) {
 
 		file.getline(buffer,sizeof(buffer));

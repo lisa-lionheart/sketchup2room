@@ -28,7 +28,13 @@ const Transform BaseTransform = {
 };
 
 
-
+//For placeholder meshes, basically undoes basetransform
+const Transform PlaceholderTransform = {
+	-1, 0, 0, 0,
+	0, 0, 1, 0,
+	0, -1, 0, 0,
+	0, 0, 0, 1
+};
 
 string SketchupHelper::fromSUString(SUStringRef& str) {
 	size_t len;
@@ -215,8 +221,6 @@ void SketchupHelper::getInstancesRecursive(SUEntitiesRef ents, Transform parentT
 		SUComponentInstanceGetTransform(instances[i],(SUTransformation*)&t);
 
 		info.instance = instances[i];
-		info.transform = parentTransform*t;
-
 		info.modelName = componentInstanceType(instances[i]);
 		info.modelId = "object_" + info.modelName;
 
@@ -231,6 +235,16 @@ void SketchupHelper::getInstancesRecursive(SUEntitiesRef ents, Transform parentT
 			info.modelName = baseName(filename);
 			info.modelId = "object_"+info.modelName;
 
+	//		float x = t.ad;
+	//		float y = t.bd;
+	//		float z = t.cd;
+
+			t = (t * PlaceholderTransform);
+
+		//	t.ad = x;
+		//	t.bd = y;
+		//	t.cd = z;
+
 			m_Placeholders[info.modelName] = filename;
 		} else {
 
@@ -239,6 +253,8 @@ void SketchupHelper::getInstancesRecursive(SUEntitiesRef ents, Transform parentT
         
 			m_Components[info.modelName] = def;
 		}
+		
+		info.transform = parentTransform*t;
 
 		m_Instances.push_back(info);
 	}

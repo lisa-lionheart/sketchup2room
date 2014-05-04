@@ -119,7 +119,7 @@ void HtmlWriter::writeObject(const InstanceInfo& _obj) {
 		if(obj.type != "nonsolid") {
 			m_Html << "collision_id=\"" << obj.modelId <<"\" ";
 		}
-
+		
 		m_Html << obj.transform << " scale=\"" << getTransformScale(obj.transform) << "\"/>" << endl;
 	}
 
