@@ -2,6 +2,7 @@ ipch
 *.suo
 *.sdf
 *.skb
+*~.skp
 *.pdb
 Debug
 examples/build
