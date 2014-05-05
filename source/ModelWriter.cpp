@@ -1,7 +1,7 @@
 #include "StdAfx.h"
 #include "ModelWriter.h"
 #include "SketchupHelper.h"
-
+#include "Material.h"
 
 
 ModelWriter::ModelWriter(const string& dir, const string& name)
@@ -80,24 +80,17 @@ void ModelWriter::write(SUEntitiesRef ents, bool recursive)
 	cout << " - Gathering materials" << endl;
 	visitFaces(ents, &ModelWriter::gatherMaterials, recursive);
 	
-	/*
-	cout << " - Generating meshes" << endl;
-	visitFaces(ents, &ModelWriter::makeHelper, recursive);
-	
-	cout << " - Writing Vertex data" << endl;
-	visitFaces(ents, &ModelWriter::writeVertices, recursive);
-
-	cout << " - Writing Faces" << endl;
-	m_VerticesUsed = 1;
-	m_TexCoordsUsed = 2;
-	visitFaces(ents, &ModelWriter::writeFaces, recursive);
-	*/
 
 	for(map<string,SUMaterialRef>::iterator itr = m_Materials.begin(); itr != m_Materials.end(); itr++) {
 		cout << " - Writing faces of " << itr->first << endl;
 
-		m_CurrentMat = itr->first;
-		m_Faces << "usemtl " << itr->first << endl;
+		Material mat(itr->second);
+		mat.saveTextures(m_OutputDir);
+
+		m_MtlFile << mat << endl;
+
+		m_CurrentMat = mat.fullName;
+		m_Faces << "usemtl " << mat.name << endl;
 		visitFaces(ents, &ModelWriter::writeFaces, recursive);
 	}
 
@@ -112,50 +105,7 @@ void ModelWriter::write(SUEntitiesRef ents, bool recursive)
 
 
 	m_ObjFile << m_Faces.str();
-	
-	cout << " - Writing Materials" << endl;
-	for(map<string,SUMaterialRef>::iterator itr = m_Materials.begin(); itr != m_Materials.end(); itr++){
-		SUMaterialRef mat = itr->second;
-		m_MtlFile << "newmtl " <<  itr->first << endl;
 		
-		m_MtlFile << "illium 4" << endl;
-
-		SUColor ambient = {0};
-		m_MtlFile << "Ka " << (ambient.red / 255.0f) << " " << (ambient.green/255.0f) << " " << (ambient.blue/255.0f) << endl; 
-		
-		SUColor diffuse;
-		SUMaterialGetColor(mat,&diffuse);
-		m_MtlFile << "Kd " << (diffuse.red / 255.0f) << " " << (diffuse.green/255.0f) << " " << (diffuse.blue/255.0f) << endl; 
-		
-		if(ambient.alpha != 1.0) {
-			m_MtlFile << "d " << (ambient.alpha / 255.0f) << endl;
-			m_MtlFile << "Tr " << (ambient.alpha / 255.0f) << endl;
-		}
-
-		SUTextureRef tex = SU_INVALID;
-		if(SUMaterialGetTexture(mat,&tex) == SU_ERROR_NONE) {
-			SUStringRef fileName = SU_INVALID;
-			SUStringCreate(&fileName);
-			if(SUTextureGetFileName(tex,&fileName) == SU_ERROR_NONE) {
-				string f = SketchupHelper::fromSUString(fileName);
-
-				for(int i=0; i < f.length(); i ++){
-					if(f[i] == ' ') f[i] = '_';
-				}
-
-				SUTextureWriteToFile(tex,(m_OutputDir+f).c_str());
-
-				m_MtlFile << "Tf 1.00 1.00 1.00" << endl;
-				//mtlFile << "map_Ka " << f << endl;
-				m_MtlFile << "map_Kd " << f << endl;
-
-				m_MtlFile << "Ni 1.00" << endl;
-				m_MtlFile << "Ks 1.00 1.00 1.00" << endl;
-				m_MtlFile << "Ns 0.00" << endl;
-			}
-		} 
-	}
-	
 }
 
 bool ModelWriter::shouldWriteBackFace(SUFaceRef face) {
@@ -212,9 +162,6 @@ void ModelWriter::writeFace(SUMeshHelperRef mesh, const Transform& transform, bo
 	SUResult res = SUMeshHelperGetVertexIndices(mesh,triCount*3,indicies.data(),&gotIndices);
 	assert(res == SU_ERROR_NONE);
 
-	SUPoint3D fakePoint = { 9999.0, 9999.0, 9999.0 };
-	size_t iFakePoint = getIndexedTex(fakePoint);
-
 	if(textured) {
 		if(front) {
 			SUMeshHelperGetFrontSTQCoords(mesh,vertexCount,textures.data(),&vertexCount);
@@ -247,14 +194,11 @@ void ModelWriter::writeFace(SUMeshHelperRef mesh, const Transform& transform, bo
 
 			int j = (t*3) + (flip ? 2-i : i);
 			
-			m_Faces << getIndexedPos(verts[indicies[j]]*transform);
-
-			if(textured) {
-				m_Faces << "/" << getIndexedTex(textures[indicies[j]]);
-			}else {
-				 m_Faces << "/" << iFakePoint;
-			}
-
+			m_Faces << getIndexedPos(verts[indicies[j]]*transform) << "/";
+			
+			if(textured)
+				m_Faces << getIndexedTex(textures[indicies[j]]);
+			
 			m_Faces << "/" <<  getIndexedNormal(normals[indicies[j]]*normalScale*transform) << " ";
 		}
 
@@ -278,133 +222,6 @@ void ModelWriter::writeFaces(SUFaceRef face, const Transform& t){
 	
 }
 
-/*
-void ModelWriter::makeHelper(SUFaceRef face, const Transform&){
-
-	SUMeshHelperRef helper = SU_INVALID;
-	SUMeshHelperCreate(&helper,face);
-	m_MeshHelpers[face.ptr] = helper;
-}
-*/
-
-/*
-void ModelWriter::writeVertices(SUFaceRef face, const Transform& t){
-	SUMeshHelperRef helper = m_MeshHelpers[face.ptr];
-
-	//m_ObjFile << "# Verts for Face " << face.ptr << endl;
-
-	size_t vertexCount = 0;
-	SUMeshHelperGetNumVertices(helper,&vertexCount);
-	
-	vector<SUPoint3D> verts(vertexCount);
-	vector<SUVector3D> normals(vertexCount);
-	vector<SUPoint3D> tcs(vertexCount);
-
-	SUMeshHelperGetVertices(helper,vertexCount,&verts[0],&vertexCount);
-	SUMeshHelperGetNormals(helper,vertexCount,&normals[0],&vertexCount);
-
-	if(shouldWriteFrontFace(face)) {
-
-		bool textured = SketchupHelper::isFrontFaceTextured(face);
-
-		if(textured) SUMeshHelperGetFrontSTQCoords(helper,vertexCount,&tcs[0],&vertexCount);
-
-		for(size_t j=0; j < vertexCount; j++) {
-			m_ObjFile << "v " << (verts[j] * t) / g_Scale << endl;
-			
-			if(textured) m_ObjFile << "vt " << tcs[j].x << " " << tcs[j].y << endl;
-			m_ObjFile << "vn " << normals[j] * t << endl;
-		}
-	}
-
-	if(shouldWriteBackFace(face)) {
-		bool textured = SketchupHelper::isBackFaceTextured(face);
-		if(textured) SUMeshHelperGetBackSTQCoords(helper,vertexCount,&tcs[0],&vertexCount);
-		for(size_t j=0; j < vertexCount; j++) {
-			m_ObjFile << "v " << (verts[j] * t) / g_Scale << endl;
-			if(textured) m_ObjFile << "vt " << tcs[j].x << " " << tcs[j].y << endl;
-			m_ObjFile << "vn " << normals[j] * -1.0f  * t << endl;
-		}
-	}
-}
-
-void ModelWriter::writeFaces(SUFaceRef face, const Transform&){
-	SUMeshHelperRef mesh = m_MeshHelpers[face.ptr];
-
-	size_t vertexCount=0;
-	SUMeshHelperGetNumVertices(mesh,&vertexCount);
-
-	size_t triCount = 0;
-	SUMeshHelperGetNumTriangles(mesh,&triCount);
-
-	size_t gotIndices = 0;
-	vector<size_t> indicies(triCount*3);
-	SUResult res = SUMeshHelperGetVertexIndices(mesh,triCount*3,indicies.data(),&gotIndices);
-	assert(res == SU_ERROR_NONE);
-		
-	
-	if(shouldWriteFrontFace(face)) {
-	
-	//	m_ObjFile << "# Front  Face " << face.ptr << endl;
-		
-		string mat = SketchupHelper::getFrontFaceMaterialName(face);
-		if(mat != m_CurrentMat){
-			m_CurrentMat = mat;
-			m_ObjFile << "usemtl " << mat << endl;
-		}
-		size_t s = m_VerticesUsed;
-		
-		if(SketchupHelper::isFrontFaceTextured(face)) {
-			size_t t = m_TexCoordsUsed;
-			for(size_t j=0; j < triCount; j++) {
-				m_ObjFile << "f ";
-				m_ObjFile << (s + indicies[(j*3)+0]) << "/" << (t + indicies[(j*3)+0]) << "/" << (s + indicies[(j*3)+0])<< " ";
-				m_ObjFile << (s + indicies[(j*3)+1]) << "/" << (t + indicies[(j*3)+1]) << "/" << (s + indicies[(j*3)+1]) << " ";
-				m_ObjFile << (s + indicies[(j*3)+2]) << "/" << (t + indicies[(j*3)+2]) << "/" << (s + indicies[(j*3)+2]) << endl;
-			}
-			m_TexCoordsUsed += vertexCount;
-		}else {
-			for(size_t j=0; j < triCount; j++) {
-		
-				m_ObjFile << "f ";
-				m_ObjFile << (s + indicies[(j*3)+0]) << "/1/" << (s + indicies[(j*3)+0])<< " ";
-				m_ObjFile << (s + indicies[(j*3)+1]) << "/1/" << (s + indicies[(j*3)+1]) << " ";
-				m_ObjFile << (s + indicies[(j*3)+2]) << "/1/" << (s + indicies[(j*3)+2]) << endl;
-			}	
-		}
-			
-		m_VerticesUsed += vertexCount;
-	}
-
-	if(shouldWriteBackFace(face)) {
-	
-		m_ObjFile << "# Back Face " << face.ptr << endl;
-		m_ObjFile << "usemtl " << SketchupHelper::getBackFaceMaterialName(face) << endl;
-
-		size_t s = m_VerticesUsed;
-		
-		if(SketchupHelper::isBackFaceTextured(face)) {
-			size_t t = m_TexCoordsUsed;
-			for(size_t j=0; j < triCount; j++) {
-				m_ObjFile << "f ";
-				m_ObjFile << (s + indicies[(j*3)+0]) << "/" << (t + indicies[(j*3)+0]) << "/" << (s + indicies[(j*3)+0]) << " ";
-				m_ObjFile << (s + indicies[(j*3)+1]) << "/" << (t + indicies[(j*3)+1]) << "/" << (s + indicies[(j*3)+1]) << " ";
-				m_ObjFile << (s + indicies[(j*3)+2]) << "/" << (t + indicies[(j*3)+2]) << "/" << (s + indicies[(j*3)+2]) << endl;
-			}
-			m_TexCoordsUsed += vertexCount;
-		} else {
-			for(size_t j=0; j < triCount; j++) {
-				m_ObjFile << "f ";
-				m_ObjFile << (s + indicies[(j*3)+0]) << "/1/" << (s + indicies[(j*3)+0]) << " ";
-				m_ObjFile << (s + indicies[(j*3)+1]) << "/1/" << (s + indicies[(j*3)+1]) << " ";
-				m_ObjFile << (s + indicies[(j*3)+2]) << "/1/" << (s + indicies[(j*3)+2]) << endl;
-			}
-		}
-		
-		m_VerticesUsed += vertexCount;
-	}
-}
-*/
 
 string ModelWriter::getMaterialFile(const string& objFile) {
 

@@ -14,6 +14,13 @@ void makeDir(string dir);
 bool fileExists(const string& file);
 bool fileCopy(const string& src, const string& dest);
 
+string executablePath();
+
+inline string sdkDir() {
+	string exe = executablePath();
+	return stringReplace(exe,"\\bin\\sketchup2room.exe","");
+}
+
 inline string fileName(const string& path) {
     int i = path.find_last_of('/');
     return (i==-1) ? path : path.substr(i+1);

@@ -57,12 +57,7 @@ string SketchupHelper::materialName(SUMaterialRef mat) {
 	SUResult res = SUMaterialGetName(mat,&str);
 	if(res == SU_ERROR_NONE) {
 		string str2 = fromSUString(str);
-		for(size_t i=0; i < str2.length(); i++){
-
-			if(str2[i] == ' '){
-				str2[i] = '_';
-			}
-		}
+		
 		return str2;
 	}
 
@@ -235,15 +230,7 @@ void SketchupHelper::getInstancesRecursive(SUEntitiesRef ents, Transform parentT
 			info.modelName = baseName(filename);
 			info.modelId = "object_"+info.modelName;
 
-	//		float x = t.ad;
-	//		float y = t.bd;
-	//		float z = t.cd;
-
 			t = (t * PlaceholderTransform);
-
-		//	t.ad = x;
-		//	t.bd = y;
-		//	t.cd = z;
 
 			m_Placeholders[info.modelName] = filename;
 		} else {

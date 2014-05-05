@@ -27,6 +27,7 @@ bool parseArguments(int argc, char* argv[], Config& config) {
 
 	config.outputDir = currentDir();
 	config.force = false;
+	config.shader = "default.fs";
     
 	for(int i=1; i < argc-1; i++){
 		string arg = argv[i];
@@ -207,10 +208,11 @@ int main(int argc, char* argv[])
     }
     
     if(!config.shader.empty()) {
-		cout << "Baking shaders :) " << endl;
-		htmlWriter.setDefaultShader("room_"+ roomName+".frag");
+		cout << "Baking default shader :) " << endl;
+		htmlWriter.setDefaultShader("room_"+ roomName+"_"+config.shader);
 		
-		ShaderWriter shaderWriter(config.outputDir + "room_"+ roomName+".frag", config.shader);
+		ShaderWriter shaderWriter(config.outputDir + "room_"+ roomName+"_"+config.shader);
+		shaderWriter.includeFile(config.shader);
 		shaderWriter.writeLights(sketchup.instances());
     }
     
