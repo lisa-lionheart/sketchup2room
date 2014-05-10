@@ -38,6 +38,10 @@ void ShaderWriter::includeFile(string filename, string fromFile) {
 		file.getline(_buff,sizeof(_buff));
 
 		string buff(_buff);
+        
+        if(buff[buff.size()-1] == '\r') {
+            buff[buff.size()-1] =0;
+        }
 
 		if(inComment) {
 			size_t i = buff.find("*/");

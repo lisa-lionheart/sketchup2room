@@ -1,6 +1,6 @@
 
 
-vec3 ambientLight = vec3(0,0,0);	//Total acumulated ambient light for pixel
+vec3 ambientLight = vec3(0.5,0.5,0.5);	//Total acumulated ambient light for pixel
 vec3 diffuseLight = vec3(0,0,0);	//Total acumulated diffuse light for pixel
 vec3 specularLight = vec3(0,0,0);	//Total acumulated specular light for pixel
 

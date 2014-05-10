@@ -18,7 +18,7 @@ string executablePath();
 
 inline string sdkDir() {
 	string exe = executablePath();
-	return stringReplace(exe,"\\bin\\sketchup2room.exe","");
+	return stringReplace(stringReplace(exe,"\\bin\\sketchup2room.exe",""),"/bin/sketchup2room","");
 }
 
 inline string fileName(const string& path) {
