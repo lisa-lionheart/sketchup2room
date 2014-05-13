@@ -7,7 +7,10 @@
 #include "Geometry.hpp"
 #include "ModelWriter.h"
 
-const float g_Scale = 40.0f;
+//const float g_Scale = 40.0f;
+const float g_Scale = 39.3700787f; //Inches in a meter
+
+
 const Transform TransformIdentity = {
 	1, 0, 0, 0,
 	0, 1, 0, 0,
