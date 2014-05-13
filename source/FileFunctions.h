@@ -42,3 +42,12 @@ inline string fileExtension(const string& path) {
     int i = path.find_last_of('.');
     return (i==-1) ? baseName(path) : path.substr(i+1);
 }
+
+inline bool isLocalAssset(const string& url) {
+    
+    if(url.substr(0,4) == "http") {
+        return false;
+    }
+    
+    return true;
+}

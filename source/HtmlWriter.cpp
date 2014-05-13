@@ -142,8 +142,21 @@ void HtmlWriter::writeObject(const InstanceInfo& _obj) {
 		if(obj.attributes["title"] != ""){
 			m_Html << "title=\""<<obj.attributes["title"]<<"\" ";
 		}
-
-		m_Html << "scale=\"1.8 2.5 1\" ";
+        
+        if(obj.attributes["col"] != ""){
+            m_Html << "col=\"" << obj.attributes["col"]<<"\" ";
+        }
+        
+        if(obj.attributes["thumb"] != ""){
+          m_Html << "thumb_id=\"" << obj.attributes["thumb"]  << "\" ";
+        }
+        
+        
+        if(obj.attributes["size"] != "") {
+            m_Html << "scale=\"" << obj.attributes["size"] << " 1\" ";
+        }else {
+            m_Html << "scale=\"1.8 2.5 1\" ";
+        }
 		writeTransform(m_Html,obj.transform,true) << "/>" << endl;
 	}
 
@@ -187,7 +200,14 @@ void HtmlWriter::writeObject(const InstanceInfo& _obj) {
  	}
     
     if(obj.type == "sound") {
-        m_Html << "<Sound id=\"sound_" << baseName(obj.value) << "_id\" rect=\"-100 -100 100 100\" loop=\"true\" />" << endl;
+        m_Html << "<Sound id=\"" << obj.value << "\" rect=\"-100 -100 100 100\" loop=\"true\" />" << endl;
+    }
+    
+    if(obj.type == "video") {
+        
+        float width = length(yaxis * obj.transform);
+        float height = length(zaxis * obj.transform);
+        m_Html << "<Video id=\"" << obj.value << "\" " << obj.transform <<" scale=\"" << width << " " << height << " 1\" />" << endl;
     }
 	
 }

@@ -58,6 +58,7 @@ string SketchupHelper::materialName(SUMaterialRef mat) {
 	if(res == SU_ERROR_NONE) {
 		string str2 = fromSUString(str);
 		
+        str2 = stringReplace(str2, "*", "");
 		return str2;
 	}
 
