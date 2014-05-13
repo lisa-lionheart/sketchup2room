@@ -7,6 +7,7 @@ class ShaderWriter {
 
 
 	ofstream m_Shader;
+	bool m_Debug;
 
 public:
 	ShaderWriter(const string& outFile);

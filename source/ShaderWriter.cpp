@@ -5,9 +5,13 @@
 
 string shaderDir() {
 	return sdkDir() + "/shaders";
+
+
 }
 
 ShaderWriter::ShaderWriter(const string& outFile) {
+
+	m_Debug = true;
 
 	m_Shader.open(outFile.c_str());
 	
@@ -39,39 +43,41 @@ void ShaderWriter::includeFile(string filename, string fromFile) {
 
 		string buff(_buff);
         
-        if(buff[buff.size()-1] == '\r') {
-            buff[buff.size()-1] =0;
-        }
-
-		if(inComment) {
-			size_t i = buff.find("*/");
-			if(i != -1){
-				buff = buff.substr(i+2);
-				inComment = false;
-			} else {
-				buff="";
+		if(!m_Debug) {
+			if(buff[buff.size()-1] == '\r') {
+				buff[buff.size()-1] =0;
 			}
 
-		}else{ 
+			if(inComment) {
+				size_t i = buff.find("*/");
+				if(i != -1){
+					buff = buff.substr(i+2);
+					inComment = false;
+				} else {
+					buff="";
+				}
 
-			size_t i = buff.find("//");
-			if(i != -1) {
-				buff = buff.substr(0,i);
+			}else{ 
+
+				size_t i = buff.find("//");
+				if(i != -1) {
+					buff = buff.substr(0,i);
+				}
+
+				i = buff.find("/*");
+				if(i != -1) {
+					buff = buff.substr(0,i);
+					inComment =true;
+				}
+
+				buff = stringReplace(buff,"\t","");
 			}
-
-			i = buff.find("/*");
-			if(i != -1) {
-				buff = buff.substr(0,i);
-				inComment =true;
-			}
-
-			buff = stringReplace(buff,"\t","");
 		}
 
 		if(buff.substr(0,8) == "#include"){
 			includeFile(string(buff).substr(9),filename);
 		}else{
-			m_Shader << buff;// << endl;
+			m_Shader << buff << endl;
 		}
 	}
 }
@@ -85,25 +91,41 @@ void ShaderWriter::writeLights(const vector<InstanceInfo>& instances) {
 
 		InstanceInfo& light = *const_cast<InstanceInfo*>(&instances[i]);
 
+		SUPoint3D pos = {0};
+		pos = (pos * light.transform) / g_Scale;
+
+		SUVector3D colour = { 1, 1, 1};
+
+		if(light.value != "") {
+			//Parse colour value
+
+			stringstream col(light.value);
+
+			col >> colour.x;
+			col >> colour.y;
+			col >> colour.z;
+		}
+
+		if(light.type == "ambient") {
+			m_Shader << "ambientLight = vec3(" << stringReplace(light.value, " ", ",") << ");";
+			if(m_Debug) m_Shader << endl;
+		}
+
+		if(light.type == "spotlight") {
+
+			float outerCone = 40;
+			float innerCone = outerCone - 0.5;
+			float range = 50;
+
+			SUVector3D dir = yaxis * light.transform;
+
+			m_Shader << "spotlight(vec3(" << pos.x << "," << pos.y << "," << pos.z << "),vec3(" << dir.x << "," << dir.y << "," << dir.z << "),vec3(" << stringReplace(light.value, " ", ",") << ")," << outerCone << "," << innerCone << "," << range << ");";
+			if(m_Debug) m_Shader << endl;
+		}
 
 		if(light.type == "light") {
 			cout << "--Got light" << endl;
-
-			SUPoint3D pos = {0};
-			pos = (pos * light.transform) / g_Scale;
-
-			SUVector3D colour = { 1, 1, 1};
-
-			if(light.value != "") {
-				//Parse colour value
-
-				stringstream col(light.value);
-
-				col >> colour.x;
-				col >> colour.y;
-				col >> colour.z;
-			}
-
+				
 			string func = "pointlight";
 
 			string posString;
@@ -124,6 +146,7 @@ void ShaderWriter::writeLights(const vector<InstanceInfo>& instances) {
 			}
 
 			m_Shader << func << "(" << posString << ",vec3(" << colour.x << "," << colour.y << "," << colour.z << "),0.00f,20.00f);";
+			if(m_Debug) m_Shader << endl;
 		}
 
 	}

@@ -13,10 +13,10 @@ HtmlWriter::HtmlWriter(const string& outDir, const string& fileName)
     m_RoomAtributes["default_sounds"] = "false";
     m_RoomAtributes["col"] = "0 0 0";
     
-	m_Title = "Untitled";
+	m_Title = baseName(fileName);
 	m_FileName = fileName;
 	m_OutputDir = outDir;
-	m_Origin = TransformIdentity;
+	m_Origin = BaseTransform;
 
 	m_Html.open(outDir + fileName);
 	m_Html.precision(3);
@@ -68,7 +68,7 @@ bool HtmlWriter::write(const vector<InstanceInfo>& instances) {
 
 	m_Html << "<html>" << endl;
 	m_Html << "<head>" << endl;
-	m_Html << "<title>SketchUp Room - " << m_Title << "</title>" << endl;
+	m_Html << "<title>" << m_Title << "</title>" << endl;
 	m_Html << "</head>" << endl;
 	m_Html << "<body>" << endl;
 	m_Html << "<p>Put your goggles on ;)</p>" << endl;
@@ -118,6 +118,16 @@ void HtmlWriter::writeObject(const InstanceInfo& _obj) {
 		
 		if(obj.type != "nonsolid") {
 			m_Html << "collision_id=\"" << obj.modelId <<"\" ";
+		}
+
+		if(obj.attributes["rotate_speed"] != ""){
+
+			string axis="0 0 1";
+			if(obj.attributes["rotate_axis"] != "") {
+				axis = obj.attributes["rotate_axis"];
+			}
+
+			m_Html << "rotate_deg_per_sec=\"" << obj.attributes["rotate_speed"] << "\" rotate_axis=\"" << axis << "\" ";
 		}
 		
 		m_Html << obj.transform << " scale=\"" << getTransformScale(obj.transform) << "\"/>" << endl;
@@ -207,7 +217,8 @@ void HtmlWriter::writeObject(const InstanceInfo& _obj) {
         
         float width = length(yaxis * obj.transform);
         float height = length(zaxis * obj.transform);
-        m_Html << "<Video id=\"" << obj.value << "\" " << obj.transform <<" scale=\"" << width << " " << height << " 1\" />" << endl;
+        m_Html << "<Video id=\"" << obj.value << "\" ";
+		writeTransform(m_Html,obj.transform,true) <<" scale=\"" << width << " " << height << " 1\" />" << endl;
     }
 	
 }

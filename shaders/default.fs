@@ -16,7 +16,7 @@ void main()
 	vec4 ks = gl_FrontMaterial.specular;
 	
 	if( iUseTexture0 == 1) {
-		kd *= texture2D(texDiffuse, gl_TexCoord[0].st);
+		kd *= texture2D(iTexture0, gl_TexCoord[0].st);
 	}
 
 	if(kd.a < 0.1) {
