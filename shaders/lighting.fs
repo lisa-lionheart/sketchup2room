@@ -29,7 +29,7 @@ vec3 flickerPos(vec3 pos) {
 	range: How far to apply the light, saves GPU cycles
 
 */
-void pointlight(vec3 pos, vec3 colour, float near, float range) {
+void pointlight(vec3 pos, vec3 colour, float near, float range, float falloff) {
 
 	vec3 n = normalize(iNormalWorld);
 	vec3 lightDir = normalize(pos - iPositionWorld);
@@ -46,7 +46,7 @@ void pointlight(vec3 pos, vec3 colour, float near, float range) {
 		dist -= 1.0;
 		dist -= near;
 
-		float i = clamp(1.0 / (dist*dist), 0.0, 1.0);
+		float i = clamp(1.0 / pow(dist,falloff), 0.0, 1.0);
 		diffuseLight += i * tangent * colour;
 	}
 
@@ -67,7 +67,7 @@ void pointlight(vec3 pos, vec3 colour, float near, float range) {
 	innerCone:  Defines the fall off of light to the oute cone, setting them to the same value will result in
 	 (unrealistic) a sharp edge. 5-15 degree seperation looks quite nice in most situations
 */
-void spotlight(vec3 pos, vec3 direction, vec3 col, float outerCone, float innerCone, float range){
+void spotlight(vec3 pos, vec3 direction, vec3 col, float outerCone, float innerCone, float range, float falloff){
 	vec3 n = normalize(iNormalWorld);
 	vec3 lightDir = normalize(pos - iPositionWorld);
 	float dist = abs(length(pos - iPositionWorld));
@@ -88,7 +88,7 @@ void spotlight(vec3 pos, vec3 direction, vec3 col, float outerCone, float innerC
 
 	float i = 1.0 - (theta - innerCone) / (outerCone-innerCone);
 
-	i= i / (dist*dist);
+	i= i / pow(dist,falloff);
 
 	diffuseLight += clamp(i * tangent, 0.0, 1.0) * col;
 

@@ -83,6 +83,18 @@ void ShaderWriter::includeFile(string filename, string fromFile) {
 }
 
 
+inline string vec3string(SUVector3D vec) {
+    stringstream ss;
+    ss << "vec3(" << vec.x << "," << vec.y << "," << vec.z << ")";
+    return ss.str();
+}
+
+inline string vec3string(SUPoint3D vec) {
+    stringstream ss;
+    ss << "vec3(" << vec.x << "," << vec.y << "," << vec.z << ")";
+    return ss.str();
+}
+
 void ShaderWriter::writeLights(const vector<InstanceInfo>& instances) {
 
 	m_Shader << "void applySceneLights() {";
@@ -90,11 +102,11 @@ void ShaderWriter::writeLights(const vector<InstanceInfo>& instances) {
 	for(size_t i = 0; i < instances.size(); i ++) {
 
 		InstanceInfo& light = *const_cast<InstanceInfo*>(&instances[i]);
-
-		SUPoint3D pos = {0};
-		pos = (pos * light.transform) / g_Scale;
-
-		SUVector3D colour = { 1, 1, 1};
+        
+        if(light.type != "light" && light.type != "spotlight" && light.type != "ambient")
+            continue;
+        
+		SUVector3D colour = { 1, 1, 1 };
 
 		if(light.value != "") {
 			//Parse colour value
@@ -105,47 +117,72 @@ void ShaderWriter::writeLights(const vector<InstanceInfo>& instances) {
 			col >> colour.y;
 			col >> colour.z;
 		}
+        
+        string colorExpr = vec3string(colour);
+        
+        float range = 20.0;
+        float falloff = 2.0;
+        
+		SUPoint3D pos = {0};
+		pos = (pos * light.transform) / g_Scale;
+        string posExpr = vec3string(pos);
+        
+        
+        if(light.attributes["range"] != "") {
+            range = (float)atof(light.attributes["range"].c_str());
+        }
+        
+        if(light.attributes["falloff"] != "") {
+            falloff = (float)atof(light.attributes["falloff"].c_str());
+        }
+
 
 		if(light.type == "ambient") {
-			m_Shader << "ambientLight = vec3(" << stringReplace(light.value, " ", ",") << ");";
+			m_Shader << "ambientLight = " << colorExpr << ";";
 			if(m_Debug) m_Shader << endl;
 		}
 
 		if(light.type == "spotlight") {
 
 			float outerCone = 40;
+            if(light.attributes["outerCone"] != "") {
+                outerCone = (float)atoi(light.attributes["outerCone"].c_str());
+            }
+            
 			float innerCone = outerCone - 0.5;
-			float range = 50;
-
+            if(light.attributes["innerCone"] != "") {
+                outerCone = (float)atoi(light.attributes["innerCone"].c_str());
+            }
+            
 			SUVector3D dir = yaxis * light.transform;
+            
+			string func = "spotlight";
+			if(light.attributes["func"] != "") {
+				func = light.attributes["func"];
+			}
+            
+			if(light.attributes["cond"] != "") {
+				string cond = stringReplace(light.attributes["cond"],"$POS",posExpr);
+                m_Shader << "if(" << cond << ") ";
+			}
 
-			m_Shader << "spotlight(vec3(" << pos.x << "," << pos.y << "," << pos.z << "),vec3(" << dir.x << "," << dir.y << "," << dir.z << "),vec3(" << stringReplace(light.value, " ", ",") << ")," << outerCone << "," << innerCone << "," << range << ");";
+			m_Shader << func << "(" << posExpr << "," << vec3string(dir) << "," << colorExpr<< ")," << outerCone << "," << innerCone << "," << range << "," << falloff << ");";
 			if(m_Debug) m_Shader << endl;
 		}
 
 		if(light.type == "light") {
-			cout << "--Got light" << endl;
 				
 			string func = "pointlight";
-
-			string posString;
-
-			stringstream ss;
-			ss << "vec3(" << pos.x << "," << pos.y << "," << pos.z << ")";
-			posString = ss.str();
-
 			if(light.attributes["func"] != "") {
 				func = light.attributes["func"];
 			}
-
+            
 			if(light.attributes["cond"] != "") {
-
-				string cond = stringReplace(light.attributes["cond"],"$POS",posString);
-
-				m_Shader << "if(" << cond << ") ";
+				string cond = stringReplace(light.attributes["cond"],"$POS",posExpr);
+                m_Shader << "if(" << cond << ") ";
 			}
 
-			m_Shader << func << "(" << posString << ",vec3(" << colour.x << "," << colour.y << "," << colour.z << "),0.00f,20.00f);";
+			m_Shader << func << "(" << posExpr << "," << colour.x << "," << colour.y << "," << colour.z << "),0.00,"<<range<<"," << falloff << ");";
 			if(m_Debug) m_Shader << endl;
 		}
 
