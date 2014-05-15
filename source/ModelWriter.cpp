@@ -254,7 +254,11 @@ set<string> ModelWriter::getTextures(const string& mtlFile) {
 	set<string> ret;
 	ifstream file(mtlFile);
 
-
+    if(!file.good()) {
+        cerr << "ERROR: Could not read material file: " << mtlFile << endl;
+        return set<string>();
+    }
+    
 	char buffer[300];
 	while(!file.eof()) {
 

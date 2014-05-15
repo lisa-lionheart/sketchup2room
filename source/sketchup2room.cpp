@@ -159,15 +159,21 @@ int main(int argc, char* argv[])
             inst.value = id;
 		}
     }
+    
+    cout << "-- Collecting Placeholders" << endl;
 	
 	map<string,string>::iterator placeHolderItr = sketchup.placeholders().begin();
 	while(placeHolderItr != sketchup.placeholders().end()){
 		
+        cout << "Found: " << placeHolderItr->second << endl;
 
 		string mtlFile = ModelWriter::getMaterialFile(placeHolderItr->second);
+        
+        cout << " -- Material File: " << mtlFile << endl;
 
 		if(!mtlFile.empty()){
 			set<string> textures = ModelWriter::getTextures(mtlFile);
+            cout << " -- Texture Files: " << textures.size() << endl;
 			assetsToCopy.insert(textures.begin(),textures.end());
 		}
 
