@@ -85,12 +85,16 @@ void ShaderWriter::includeFile(string filename, string fromFile) {
 
 inline string vec3string(SUVector3D vec) {
     stringstream ss;
+	ss.precision(3);
+	ss.setf( std::ios::fixed, std:: ios::floatfield );
     ss << "vec3(" << vec.x << "," << vec.y << "," << vec.z << ")";
     return ss.str();
 }
 
 inline string vec3string(SUPoint3D vec) {
     stringstream ss;
+	ss.precision(3);
+	ss.setf( std::ios::fixed, std:: ios::floatfield );
     ss << "vec3(" << vec.x << "," << vec.y << "," << vec.z << ")";
     return ss.str();
 }
@@ -118,7 +122,7 @@ void ShaderWriter::writeLights(const vector<InstanceInfo>& instances) {
 			col >> colour.z;
 		}
         
-        string colorExpr = vec3string(colour);
+        string colourExpr = vec3string(colour);
         
         float range = 20.0;
         float falloff = 2.0;
@@ -138,7 +142,7 @@ void ShaderWriter::writeLights(const vector<InstanceInfo>& instances) {
 
 
 		if(light.type == "ambient") {
-			m_Shader << "ambientLight = " << colorExpr << ";";
+			m_Shader << "ambientLight = " << colourExpr << ";";
 			if(m_Debug) m_Shader << endl;
 		}
 
@@ -166,7 +170,7 @@ void ShaderWriter::writeLights(const vector<InstanceInfo>& instances) {
                 m_Shader << "if(" << cond << ") ";
 			}
 
-			m_Shader << func << "(" << posExpr << "," << vec3string(dir) << "," << colorExpr<< ")," << outerCone << "," << innerCone << "," << range << "," << falloff << ");";
+			m_Shader << func << "(" << posExpr << "," << vec3string(dir) << "," << colourExpr<< "," << outerCone << "," << innerCone << "," << range << "," << falloff << ");";
 			if(m_Debug) m_Shader << endl;
 		}
 
@@ -182,7 +186,7 @@ void ShaderWriter::writeLights(const vector<InstanceInfo>& instances) {
                 m_Shader << "if(" << cond << ") ";
 			}
 
-			m_Shader << func << "(" << posExpr << "," << colour.x << "," << colour.y << "," << colour.z << "),0.00,"<<range<<"," << falloff << ");";
+			m_Shader << func << "(" << posExpr << "," << colourExpr << ",0.00,"<<range<<"," << falloff << ");";
 			if(m_Debug) m_Shader << endl;
 		}
 

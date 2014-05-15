@@ -102,18 +102,11 @@ void spotlight(vec3 pos, vec3 direction, vec3 col, float outerCone, float innerC
 }
 
 /*
-	A point light but wiht a flickery effect
+	A point light but with a flickery effect
 	
 */
-void torchlight(vec3 pos, vec3 colour, float near, float range) {
-	pointlight(flickerPos(pos),colour, near, range); 
-}
-
-/*
-	Set the global ambient level
-*/
-void ambient(vec3 pos, vec3 colour, float near, float range) {
-	ambientLight = colour;
+void torchlight(vec3 pos, vec3 colour, float near, float range, float falloff) {
+	pointlight(flickerPos(pos),colour, near, range,falloff); 
 }
 
 /* 

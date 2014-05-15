@@ -210,7 +210,13 @@ void HtmlWriter::writeObject(const InstanceInfo& _obj) {
  	}
     
     if(obj.type == "sound") {
-        m_Html << "<Sound id=\"" << obj.value << "\" rect=\"-100 -100 100 100\" loop=\"true\" />" << endl;
+        m_Html << "<Sound id=\"" << obj.value << "\" rect=\"-100 -100 100 100\"";
+		
+		if(obj.attributes["loop"] == "true") {
+			m_Html << " loop=\"true\"";
+		}
+
+		m_Html << " />" << endl;
     }
     
     if(obj.type == "video") {
