@@ -5,7 +5,7 @@ A tool for creating VR "rooms" from google sketchup files
 
 [Check out the VR site](http://static.croxford.me/SketchUpTutorial/)
 
-[Download](https://github.com/lisa-lionheart/sketchup2room/archive/master.zip)
+[Download](https://github.com/lisa-lionheart/sketchup2room/archive/v2.zip)
 
 Why?
 ----
