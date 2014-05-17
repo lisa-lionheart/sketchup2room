@@ -16,13 +16,18 @@ void main()
 	vec4 ks = gl_FrontMaterial.specular;
 	
 	if( iUseTexture0 == 1) {
-		kd *= texture2D(iTexture0, gl_TexCoord[0].st);
+		vec4 kdm = texture2D(iTexture0, gl_TexCoord[0].st);
+		
+		if(kdm.a > 0.1) {
+			kdm.a = 1.0;
+		}
+		
+		kd *= kdm;
 	}
 
 	if(kd.a < 0.1) {
 		discard;
 	}
-	
 	applySceneLights();
     
 	vec3 col = kd.rgb * (diffuseLight + ambientLight + ka.rgb) + (ks.rgb * specularLight);
