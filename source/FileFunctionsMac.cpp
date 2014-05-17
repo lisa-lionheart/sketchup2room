@@ -11,10 +11,20 @@
 #include <sys/stat.h>
 #include <sys/kernel.h>
 
+#include <mach-o/dyld.h>
+
+
 string currentDir() {
     char buff[400];
     getcwd(buff, 400);
     return buff;
+}
+
+string executablePath() {
+    char path[1024];
+    uint32_t size = sizeof(path);
+    _NSGetExecutablePath(path, &size);
+    return path;
 }
 
 void makeDir(string dir) {

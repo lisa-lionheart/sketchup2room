@@ -27,6 +27,7 @@ bool parseArguments(int argc, char* argv[], Config& config) {
 
 	config.outputDir = currentDir();
 	config.force = false;
+	config.shader = "default.fs";
     
 	for(int i=1; i < argc-1; i++){
 		string arg = argv[i];
@@ -67,7 +68,6 @@ bool parseArguments(int argc, char* argv[], Config& config) {
 
 
 
-
 int main(int argc, char* argv[])
 {
 	if(argc < 2){
@@ -105,7 +105,7 @@ int main(int argc, char* argv[])
         
         for(int i = 0; i < 6;i++){
             string f = stringReplace(config.skyBox,"$",directions[i]);
-            string id = "image_" + baseName(f) + "_id";
+            string id = "image_" + baseName(f);
             htmlWriter.setRoomAtributes(string("skybox_") + directions[i] + "_id", id);
             htmlWriter.addAsset("<AssetImage id=\""+id+"\" src=\"" + fileName(f) + "\" />");
             assetsToCopy.insert(f);
@@ -120,28 +120,60 @@ int main(int argc, char* argv[])
     for(size_t i=0; i < sketchup.instances().size();i++) {
         
         InstanceInfo& inst = sketchup.instances()[i];
-        if(inst.value == "") continue;
         
-		if(inst.type == "sound" || inst.type == "image" ) {
+        if(inst.type == "link" && inst.attributes["thumb"] != "") {
+            string f = inst.attributes["thumb"];
+            if(isLocalAssset(f)) {
+                assetsToCopy.insert(f);
+                f = fileName(f);
+            }
+            string id = "image_" + baseName(f);
+            htmlWriter.addAsset("<AssetImage id=\""+id+"\" src=\""+f+"\"/>");
+            inst.attributes["thumb"] = id;
+        }
+       
+        if(inst.value == "") continue;
+
+		if(inst.type == "sound" || inst.type == "image" || inst.type == "video" ) {
+            
+            string f = inst.value;
+            if(isLocalAssset(f)) {
+                assetsToCopy.insert(f);
+                f = fileName(f);
+            }
+            
+            string id = inst.type + "_" + stringReplace(stringReplace(baseName(f), " ", "_"), "%20", "_");
+            
 			if(inst.type == "sound") {
-				htmlWriter.addAsset("<AssetSound id=\"sound_"+baseName(inst.value)+"_id\" src=\""+fileName(inst.value)+"\" />");
+				htmlWriter.addAsset("<AssetSound id=\""+id+"\" src=\""+f+"\" />");
+			}
+            
+            if(inst.type == "video") {
+				htmlWriter.addAsset("<AssetVideo id=\""+id+"\" src=\""+f+"\" />");
+			}
+            
+            if(inst.type == "image") {
+				htmlWriter.addAsset("<AssetImage id=\""+id+"\" src=\""+f+"\" />");
 			}
         
-			if(inst.value.substr(0,5) == "http:")
-				continue;
-        
-			assetsToCopy.insert(inst.value);
+            inst.value = id;
 		}
     }
+    
+    cout << "-- Collecting Placeholders" << endl;
 	
 	map<string,string>::iterator placeHolderItr = sketchup.placeholders().begin();
 	while(placeHolderItr != sketchup.placeholders().end()){
 		
+        cout << "Found: " << placeHolderItr->second << endl;
 
 		string mtlFile = ModelWriter::getMaterialFile(placeHolderItr->second);
+        
+        cout << " -- Material File: " << mtlFile << endl;
 
 		if(!mtlFile.empty()){
 			set<string> textures = ModelWriter::getTextures(mtlFile);
+            cout << " -- Texture Files: " << textures.size() << endl;
 			assetsToCopy.insert(textures.begin(),textures.end());
 		}
 
@@ -207,10 +239,11 @@ int main(int argc, char* argv[])
     }
     
     if(!config.shader.empty()) {
-		cout << "Baking shaders :) " << endl;
-		htmlWriter.setDefaultShader("room_"+ roomName+".frag");
+		cout << "Baking default shader :) " << endl;
+		htmlWriter.setDefaultShader("room_"+ roomName+"_"+config.shader);
 		
-		ShaderWriter shaderWriter(config.outputDir + "room_"+ roomName+".frag", config.shader);
+		ShaderWriter shaderWriter(config.outputDir + "room_"+ roomName+"_"+config.shader);
+		shaderWriter.includeFile(config.shader);
 		shaderWriter.writeLights(sketchup.instances());
     }
     

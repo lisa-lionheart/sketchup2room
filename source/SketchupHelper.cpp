@@ -7,7 +7,10 @@
 #include "Geometry.hpp"
 #include "ModelWriter.h"
 
-const float g_Scale = 40.0f;
+//const float g_Scale = 40.0f;
+const float g_Scale = 39.3700787f; //Inches in a meter
+
+
 const Transform TransformIdentity = {
 	1, 0, 0, 0,
 	0, 1, 0, 0,
@@ -28,7 +31,13 @@ const Transform BaseTransform = {
 };
 
 
-
+//For placeholder meshes, basically undoes basetransform
+const Transform PlaceholderTransform = {
+	-1, 0, 0, 0,
+	0, 0, 1, 0,
+	0, -1, 0, 0,
+	0, 0, 0, 1
+};
 
 string SketchupHelper::fromSUString(SUStringRef& str) {
 	size_t len;
@@ -51,12 +60,8 @@ string SketchupHelper::materialName(SUMaterialRef mat) {
 	SUResult res = SUMaterialGetName(mat,&str);
 	if(res == SU_ERROR_NONE) {
 		string str2 = fromSUString(str);
-		for(size_t i=0; i < str2.length(); i++){
-
-			if(str2[i] == ' '){
-				str2[i] = '_';
-			}
-		}
+		
+        str2 = stringReplace(str2, "*", "");
 		return str2;
 	}
 
@@ -215,8 +220,6 @@ void SketchupHelper::getInstancesRecursive(SUEntitiesRef ents, Transform parentT
 		SUComponentInstanceGetTransform(instances[i],(SUTransformation*)&t);
 
 		info.instance = instances[i];
-		info.transform = parentTransform*t;
-
 		info.modelName = componentInstanceType(instances[i]);
 		info.modelId = "object_" + info.modelName;
 
@@ -231,6 +234,8 @@ void SketchupHelper::getInstancesRecursive(SUEntitiesRef ents, Transform parentT
 			info.modelName = baseName(filename);
 			info.modelId = "object_"+info.modelName;
 
+			t = (t * PlaceholderTransform);
+
 			m_Placeholders[info.modelName] = filename;
 		} else {
 
@@ -239,6 +244,8 @@ void SketchupHelper::getInstancesRecursive(SUEntitiesRef ents, Transform parentT
         
 			m_Components[info.modelName] = def;
 		}
+		
+		info.transform = parentTransform*t;
 
 		m_Instances.push_back(info);
 	}

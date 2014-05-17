@@ -41,6 +41,7 @@
     <LinkIncremental>false</LinkIncremental>
     <LibraryPath>C:\Users\Lisa\Development\binaries\x86;$(LibraryPath)</LibraryPath>
     <IncludePath>C:\Users\Lisa\Development\headers;$(IncludePath)</IncludePath>
+    <OutDir>$(SolutionDir)bin\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -91,6 +92,7 @@
     <ClInclude Include="FileFunctions.h" />
     <ClInclude Include="Geometry.hpp" />
     <ClInclude Include="HtmlWriter.h" />
+    <ClInclude Include="Material.h" />
     <ClInclude Include="ModelWriter.h" />
     <ClInclude Include="ShaderWriter.h" />
     <ClInclude Include="SketchupHelper.h" />
@@ -100,6 +102,7 @@
   <ItemGroup>
     <ClCompile Include="FileFunctionsWin.cpp" />
     <ClCompile Include="HtmlWriter.cpp" />
+    <ClCompile Include="Material.cpp" />
     <ClCompile Include="ModelWriter.cpp" />
     <ClCompile Include="ShaderWriter.cpp" />
     <ClCompile Include="sketchup2room.cpp" />

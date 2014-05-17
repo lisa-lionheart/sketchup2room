@@ -46,3 +46,11 @@ bool fileCopy(const string& src, const string& dest) {
     
     return true;
 }
+
+
+string executablePath() {
+
+	char buff[200];
+	GetModuleFileNameA(0,buff,200);
+	return buff;
+}

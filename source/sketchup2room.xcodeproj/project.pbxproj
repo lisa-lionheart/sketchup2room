@@ -15,6 +15,7 @@
 		4284AD041906684500EC2CFD /* FileFunctionsMac.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4284AD031906684500EC2CFD /* FileFunctionsMac.cpp */; };
 		4284AD1419086B1500EC2CFD /* ShaderWriter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4284AD1219086B1500EC2CFD /* ShaderWriter.cpp */; };
 		4284AD181909105300EC2CFD /* libSlapi.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 4284AD171909105300EC2CFD /* libSlapi.dylib */; };
+		4284AD1B1918356300EC2CFD /* Material.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4284AD191918356300EC2CFD /* Material.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -48,6 +49,8 @@
 		4284AD1219086B1500EC2CFD /* ShaderWriter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ShaderWriter.cpp; sourceTree = "<group>"; };
 		4284AD1319086B1500EC2CFD /* ShaderWriter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ShaderWriter.h; sourceTree = "<group>"; };
 		4284AD171909105300EC2CFD /* libSlapi.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libSlapi.dylib; path = ../bin/lib/libSlapi.dylib; sourceTree = "<group>"; };
+		4284AD191918356300EC2CFD /* Material.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Material.cpp; sourceTree = "<group>"; };
+		4284AD1A1918356300EC2CFD /* Material.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Material.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -83,6 +86,8 @@
 		4284ACFF1906654F00EC2CFD /* source */ = {
 			isa = PBXGroup;
 			children = (
+				4284AD191918356300EC2CFD /* Material.cpp */,
+				4284AD1A1918356300EC2CFD /* Material.h */,
 				4284AD1219086B1500EC2CFD /* ShaderWriter.cpp */,
 				4284AD1319086B1500EC2CFD /* ShaderWriter.h */,
 				4284ACEF1906654900EC2CFD /* HtmlWriter.h */,
@@ -157,6 +162,7 @@
 				4284ACFC1906654900EC2CFD /* sketchup2room.cpp in Sources */,
 				4284ACFD1906654900EC2CFD /* SketchupHelper.cpp in Sources */,
 				4284ACFA1906654900EC2CFD /* HtmlWriter.cpp in Sources */,
+				4284AD1B1918356300EC2CFD /* Material.cpp in Sources */,
 				4284AD1419086B1500EC2CFD /* ShaderWriter.cpp in Sources */,
 				4284ACFE1906654900EC2CFD /* stdafx.cpp in Sources */,
 				4284AD041906684500EC2CFD /* FileFunctionsMac.cpp in Sources */,

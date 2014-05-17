@@ -14,6 +14,13 @@ void makeDir(string dir);
 bool fileExists(const string& file);
 bool fileCopy(const string& src, const string& dest);
 
+string executablePath();
+
+inline string sdkDir() {
+	string exe = executablePath();
+	return stringReplace(stringReplace(exe,"\\bin\\sketchup2room.exe",""),"/bin/sketchup2room","");
+}
+
 inline string fileName(const string& path) {
     int i = path.find_last_of('/');
     return (i==-1) ? path : path.substr(i+1);
@@ -34,4 +41,13 @@ inline string baseName(const string& path) {
 inline string fileExtension(const string& path) {
     int i = path.find_last_of('.');
     return (i==-1) ? baseName(path) : path.substr(i+1);
+}
+
+inline bool isLocalAssset(const string& url) {
+    
+    if(url.substr(0,4) == "http") {
+        return false;
+    }
+    
+    return true;
 }
