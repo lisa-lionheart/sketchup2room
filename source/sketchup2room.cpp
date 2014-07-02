@@ -133,6 +133,8 @@ int main(int argc, char* argv[])
         }
        
         if(inst.value == "") continue;
+        
+        cout << inst.value << endl;
 
 		if(inst.type == "sound" || inst.type == "image" || inst.type == "video" ) {
             
@@ -189,7 +191,7 @@ int main(int argc, char* argv[])
     set<string>::iterator fileItr = assetsToCopy.begin();
     while(fileItr != assetsToCopy.end()){
         if(!fileExists(*fileItr)) {
-            cout << "Error file " << *fileItr << " could not be located";
+            cout << "Error file " << *fileItr << " could not be located" << endl;
             return 1;
         }
         

@@ -226,5 +226,12 @@ void HtmlWriter::writeObject(const InstanceInfo& _obj) {
         m_Html << "<Video id=\"" << obj.value << "\" ";
 		writeTransform(m_Html,obj.transform,true) <<" scale=\"" << width << " " << height << " 1\" />" << endl;
     }
+    
+    if(obj.type == "image") {
+        
+        m_Html << "<Image id=\"" << obj.value << "\" ";
+		writeTransform(m_Html,obj.transform,true) <<" />" << endl;
+        
+    }
 	
 }

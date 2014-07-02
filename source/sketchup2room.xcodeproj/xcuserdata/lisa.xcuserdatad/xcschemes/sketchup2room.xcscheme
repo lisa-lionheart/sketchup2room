@@ -44,7 +44,7 @@
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       launchStyle = "0"
       useCustomWorkingDirectory = "YES"
-      customWorkingDirectory = "/Users/lisa/dev/personal/sketchup2room/examples"
+      customWorkingDirectory = "/Users/lisa/dev/personal/sketchup2room/workspace"
       buildConfiguration = "Debug"
       ignoresPersistentStateOnLaunch = "NO"
       debugDocumentVersioning = "YES"
@@ -60,7 +60,7 @@
       </BuildableProductRunnable>
       <CommandLineArguments>
          <CommandLineArgument
-            argument = "--out build --html index.html index.skp"
+            argument = "--out build --html image_test.html image_test.skp"
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument

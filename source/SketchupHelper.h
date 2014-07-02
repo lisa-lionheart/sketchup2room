@@ -12,6 +12,7 @@ struct InstanceInfo {
 	map<string,string> attributes;
 	string value;
 
+    SUTextureRef texture;
 };
 
 class SketchupHelper

@@ -148,7 +148,7 @@ bool SketchupHelper::openFile(const string& filename) {
     }
     
     
-    cout << "- Processing file" << filename;
+    cout << "- Processing file" << filename << endl;
     
     SUModelGetEntities(m_Model, &m_TopLevelEnts);
     getInstancesRecursive(m_TopLevelEnts);
@@ -214,11 +214,11 @@ void SketchupHelper::getInstancesRecursive(SUEntitiesRef ents, Transform parentT
 
 	for(size_t i =0; i < instances.size(); i++) {
 
-		InstanceInfo info;
+		InstanceInfo info = {0};
 
 		Transform t;
 		SUComponentInstanceGetTransform(instances[i],(SUTransformation*)&t);
-
+        
 		info.instance = instances[i];
 		info.modelName = componentInstanceType(instances[i]);
 		info.modelId = "object_" + info.modelName;
@@ -249,6 +249,61 @@ void SketchupHelper::getInstancesRecursive(SUEntitiesRef ents, Transform parentT
 
 		m_Instances.push_back(info);
 	}
+    
+    
+    size_t numImages = 0;
+    SUEntitiesGetNumImages(ents, &numImages);
+    if(numImages > 0 ) {
+        vector<SUImageRef> images(numImages);
+        
+        cout << "Num Images: " << numImages << endl;
+        
+        SUEntitiesGetImages(ents, numImages, images.data(), &numImages);
+        for(size_t i=0; i < numImages; i++) {
+            
+            cout << "Got image " << images[i].ptr << endl;
+            
+            Transform t;
+            SUImageGetTransform(images[i], (SUTransformation*)&t);
+            
+            
+            InstanceInfo info = {0};
+            info.transform = parentTransform*t;
+            info.modelName = "!image";
+            info.type = "image";
+            
+            SUStringRef filename = SU_INVALID;
+            SUStringCreate(&filename);
+            
+            //cout << "Filename: " << filename.ptr << fromSUString(filename) << endl;
+            
+            SUImageGetFileName(images[i], &filename);
+            info.value = fromSUString(filename);
+            
+            cout << "Filename: " <<  info.value  << endl;
+            
+            
+            //cout << "Texture: " << info.texture.ptr << endl;
+            
+            double width, height;
+            SUImageGetDimensions(images[i], &width, &height);
+            
+            width /= g_Scale;
+            height /= g_Scale;
+            
+            cout << "Dimensions: " << width << "m, " << height << "m" << endl;
+            
+            
+            float scaleX = length(xaxis * t);
+            float scaleY = length(yaxis * t);
+            
+            cout << "Scale: " << scaleX << ", " << scaleY << endl;
+            
+            
+            m_Instances.push_back(info);
+            
+        }
+    }
 
 
 	SUEntitiesGetNumGroups(ents,&count);
