@@ -54,7 +54,7 @@ void ModelWriter::visitFaces(SUEntitiesRef ents, VisitorFunc func, bool recursiv
 		visitFaces(ents2,func,true, transform * t);
 	}
 
-	if(recursive) {
+	/*if(recursive) {
 		
 		SUEntitiesGetNumInstances(ents,&count);
 		vector<SUComponentInstanceRef> instances(count);
@@ -72,7 +72,7 @@ void ModelWriter::visitFaces(SUEntitiesRef ents, VisitorFunc func, bool recursiv
 
 			visitFaces(ents2,func,true, transform * t);
 		}
-	}
+	}*/
 }
 
 void ModelWriter::write(SUEntitiesRef ents, bool recursive)

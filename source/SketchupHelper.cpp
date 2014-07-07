@@ -2,6 +2,7 @@
 #include "stdafx.h"
 #include "SketchupHelper.h"
 #include <fstream>
+#include <sstream>
 
 
 #include "Geometry.hpp"
@@ -21,6 +22,7 @@ const Transform TransformIdentity = {
 const SUVector3D xaxis = { 1.0, 0.0, 0.0 };
 const SUVector3D yaxis = { 0.0, 1.0, 0.0 };
 const SUVector3D zaxis = { 0.0, 0.0, 1.0 };
+const SUPoint3D NullPos = { 0 };
 
 //Transform sketchup space to JansusVR space
 const Transform BaseTransform = {
@@ -148,7 +150,7 @@ bool SketchupHelper::openFile(const string& filename) {
     }
     
     
-    cout << "- Processing file" << filename;
+    cout << "- Processing file" << filename << endl;
     
     SUModelGetEntities(m_Model, &m_TopLevelEnts);
     getInstancesRecursive(m_TopLevelEnts);
@@ -181,6 +183,19 @@ bool SketchupHelper::parseInstanceName(const string& name, InstanceInfo& meta) {
 		}
 	}
 
+	if(meta.type == "p") 
+		meta.type = "paragraph";
+
+	if(meta.type == "t") 
+		meta.type = "text";
+
+	if(meta.type == "i")
+		meta.type = "image";
+
+	if(meta.type == "v")
+		meta.type = "video";
+
+
 	meta.value = value;
 
 	if(lastPipe != firstPipe){
@@ -204,7 +219,27 @@ bool SketchupHelper::parseInstanceName(const string& name, InstanceInfo& meta) {
 }
 
 void SketchupHelper::getInstancesRecursive(SUEntitiesRef ents, Transform parentTransform) {
-	
+	size_t count =0;
+    
+	extractInstances(ents,parentTransform);
+	extractImages(ents,parentTransform);
+    
+	SUEntitiesGetNumGroups(ents,&count);
+	vector<SUGroupRef> groups(count);
+	SUEntitiesGetGroups(ents,count,groups.data(),&count);
+
+	for(size_t i =0; i < groups.size(); i++) {
+
+		SUGroupGetEntities(groups[i],&ents);
+
+		Transform t;
+		SUGroupGetTransform(groups[i],(SUTransformation*)&t);
+		getInstancesRecursive(ents, parentTransform*t);
+	}
+
+}
+
+void SketchupHelper::extractInstances(SUEntitiesRef ents, const Transform& parentTransform) {
 	size_t count =0;
 	SUEntitiesGetNumInstances(ents,&count);
 	vector<SUComponentInstanceRef> instances(count);
@@ -214,19 +249,16 @@ void SketchupHelper::getInstancesRecursive(SUEntitiesRef ents, Transform parentT
 
 	for(size_t i =0; i < instances.size(); i++) {
 
-		InstanceInfo info;
+		InstanceInfo info = {0};
 
 		Transform t;
 		SUComponentInstanceGetTransform(instances[i],(SUTransformation*)&t);
-
+        
 		info.instance = instances[i];
 		info.modelName = componentInstanceType(instances[i]);
 		info.modelId = "object_" + info.modelName;
 
-		
-
 		parseInstanceName(componentInstanceName(instances[i]),info);
-
 
 		if(info.modelName[0] == '$') {
 
@@ -249,20 +281,83 @@ void SketchupHelper::getInstancesRecursive(SUEntitiesRef ents, Transform parentT
 
 		m_Instances.push_back(info);
 	}
-
-
-	SUEntitiesGetNumGroups(ents,&count);
-	vector<SUGroupRef> groups(count);
-	SUEntitiesGetGroups(ents,count,groups.data(),&count);
-
-	for(size_t i =0; i < groups.size(); i++) {
-
-		SUGroupGetEntities(groups[i],&ents);
-
-		Transform t;
-		SUGroupGetTransform(groups[i],(SUTransformation*)&t);
-		getInstancesRecursive(ents, parentTransform*t);
-	}
-
 }
 
+void SketchupHelper::extractImages(SUEntitiesRef ents, const Transform& parentTransform) {
+
+	size_t numImages = 0;
+    SUEntitiesGetNumImages(ents, &numImages);
+    if(numImages > 0 ) {
+        vector<SUImageRef> images(numImages);
+        
+        cout << "Num Images: " << numImages << endl;
+        
+        SUEntitiesGetImages(ents, numImages, images.data(), &numImages);
+        for(size_t i=0; i < numImages; i++) {
+            
+            cout << "Got image " << images[i].ptr << endl;
+            
+            Transform t;
+            SUImageGetTransform(images[i], (SUTransformation*)&t);
+
+			            
+            double suWidth, suHeight;	//The defined size in sketchup
+            SUImageGetDimensions(images[i], &suWidth, &suHeight);
+     		
+
+            InstanceInfo info = {0};
+			info.transform = parentTransform*t;
+            info.modelName = "!image";
+            info.type = "image";
+       
+
+			info.value = extractImageToFile(images[i]);
+
+			size_t pxWidth, pxHeight;
+			SUImageGetPixelDimensions(images[i], &pxWidth, &pxHeight);
+			
+			float aspectRatio = (float)pxHeight / (float)pxWidth;
+			float scaleX = suWidth / (2.0f * g_Scale);
+			float scaleY = suHeight / (2.0f*g_Scale*aspectRatio);
+
+			stringstream scale;
+			scale << scaleX << " " << scaleY << " 0";
+			info.attributes["scale"] = scale.str();
+
+			info.offset.x = (suWidth*0.5f) / length(xaxis*t);
+			info.offset.y = (suHeight*0.5f) / length(yaxis*t);
+			info.offset.z = -(g_Scale*0.09);
+
+            m_Instances.push_back(info);
+        }
+    }
+}
+
+string SketchupHelper::extractImageToFile(SUImageRef image) {
+
+
+	SUStringRef imageName = SU_INVALID;
+	SUStringCreate(&imageName);
+	SUImageGetFileName(image, &imageName);
+
+
+	string filename = fileName(fromSUString(imageName));
+
+	cout << "Extracting " << filename << endl;
+
+	SUTextureWriterRef writer = {0};
+	SUTextureWriterCreate(&writer);
+
+	long id = 0;
+	SUTextureWriterLoadEntity(writer,SUImageToEntity(image),&id);
+
+
+	string destFile = tempDir() + filename;
+
+	SUTextureWriterWriteTexture(writer,id,destFile.c_str(), false);
+
+	SUTextureWriterRelease(&writer);
+
+
+	return destFile;
+}

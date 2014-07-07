@@ -29,7 +29,7 @@ vec3 flickerPos(vec3 pos) {
 	range: How far to apply the light, saves GPU cycles
 
 */
-void pointlight(vec3 pos, vec3 colour, float near, float range, float falloff) {
+void light(vec3 pos, vec3 colour, float near, float range, float falloff) {
 
 	vec3 n = normalize(iNormalWorld);
 	vec3 lightDir = normalize(pos - iPositionWorld);
@@ -101,12 +101,32 @@ void spotlight(vec3 pos, vec3 direction, vec3 col, float outerCone, float innerC
 
 }
 
+/* 
+	Directional light source
+*/
+void directional(vec3 direction, vec3 colour) {
+	vec3 n = normalize(iNormalWorld);
+	vec3 lightDir = -normalize(direction);
+	
+	float tangent = dot(lightDir,n);
+	if(tangent > 0.0) {
+		diffuseLight += tangent * colour;
+	}
+
+	vec3 rVector = normalize(2.0 * n * dot(n, lightDir) - lightDir);
+	vec3 viewVector = -normalize(iPositionWorld-iPlayerPosition);
+	float RdotV = dot(rVector, viewVector);
+	
+	if (RdotV > 0.0)
+		specularLight += 0.1 * colour * pow(RdotV, 100.0) ;
+}
+
 /*
 	A point light but with a flickery effect
 	
 */
 void torchlight(vec3 pos, vec3 colour, float near, float range, float falloff) {
-	pointlight(flickerPos(pos),colour, near, range,falloff); 
+	light(flickerPos(pos),colour, near, range,falloff); 
 }
 
 /* 

@@ -84,17 +84,25 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <None Include="..\shaders\default.fs" />
+    <None Include="..\shaders\janus_placeholder.vs" />
+    <None Include="..\shaders\janus_uniforms.fs" />
+    <None Include="..\shaders\lighting.fs" />
+    <None Include="..\shaders\shaders.sbproj" />
+    <None Include="..\shaders\test.fs" />
     <None Include="ReadMe.txt" />
     <None Include="test.skp" />
     <None Include="testlevel1.skp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Config.h" />
     <ClInclude Include="FileFunctions.h" />
     <ClInclude Include="Geometry.hpp" />
     <ClInclude Include="HtmlWriter.h" />
     <ClInclude Include="Material.h" />
     <ClInclude Include="ModelWriter.h" />
     <ClInclude Include="ShaderWriter.h" />
+    <ClInclude Include="Sketchup2Room.h" />
     <ClInclude Include="SketchupHelper.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />

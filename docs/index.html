@@ -1,0 +1,95 @@
+<html>
+</head>
+<title>SketchUp 2 Room Documentation</title>
+</head>
+<style>
+
+body {
+
+	font-family: Arial;
+	margin: 30px;
+
+}
+
+</style>
+<body>
+<p>Please bear with us, this documentation is far from complete.</p>
+<p><a href="slides.html">For now here are the slides from the tutorial room.</a></p>
+<h2 id="quick-start">Quick start</h2>
+<ol>
+<li>Create and save your SketchUp file in the &quot;workspace&quot; folder</li>
+<li>Double click on build.cmd, you html will be created in a directory called build</li>
+<li>When you make changes delete the build folder and run build.cmd again</li>
+</ol>
+<h1 id="how-to-compose-your-sketchup-file-for-use-with-sketchup2room">How to compose your SketchUp file for use with sketchup2room</h1>
+<p>Whilst naively making a room in SketchuUp should more or less work, there is a way to get the best results.</p>
+<h2 id="components-basics">Components Basics</h2>
+<p>Sketchup2room will compile any ungrouped and grouped geometry into a main.obj file. Geometry in &quot;components&quot; will be saved as external OBJ files and have HTML for them generated. It is very important that when you have repeated features, that you make a single component for it and then create multiple instances of that component. Its also a good idea to make large pieces of geometry that are not repeated a component to cut down on load times. To create a component select some things in sketchup make a group and then select the make component option. I highly recommend changing the name from Group#x default name.</p>
+<p>You can create &quot;placeholders&quot; components by putting a &#39;!&#39; in front of the component name. For example you could create a link without any door frame by making a component and calling it &quot;!door&quot; and setting the instance name as described below. This is quite often used to place lights.</p>
+<p>As well as creating place holders you can make a component non solid by adding &#39;+&#39; infront of the component name. It is advised to do this with any highly complex models you create to improve room frame rates.</p>
+<p>Please check out the examples skp files, to see how this works in practice.</p>
+<h2 id="default-material">Default Material</h2>
+<p>Sketchup2room will cull faces that have the Default Material, to make sure faces are exported apply a material to them</p>
+<h1 id="making-dynamic-objects-">Making dynamic objects.</h1>
+<p>By setting a name on individual instances of components you can tell sketchup2room to set the location of the entrance portal and create links to new rooms.</p>
+<p>The format is, where the pipe character &quot;|&quot; separates sections:</p>
+<blockquote>
+<p>$type|option1,option2=value|Text or URL</p>
+</blockquote>
+<h2 id="-origin-type">$origin type</h2>
+<p>Give an instance the name $origin to specify the location of the entrance portal. The system will use the components local x (green) axis. So make sure you create your prop with the right orientation (green axis facing outwards)</p>
+<h2 id="-link-type">$link type</h2>
+<p>Simple:</p>
+<blockquote>
+<p>$link|room3.html</p>
+</blockquote>
+<p>Advanced:</p>
+<blockquote>
+<p>$link|noglow,notext|room3.html</p>
+</blockquote>
+<p><strong>TODO: Document parameters</strong></p>
+<h2 id="-text-or-t-type">$text or $t type</h2>
+<p>Creates a text element at the given position.</p>
+<p>Example:</p>
+<blockquote>
+<p>$text|text_col=1 1 1|JanusVR is cool</p>
+</blockquote>
+<p><strong>TODO: Document parameters</strong></p>
+<h2 id="-paragraph-or-p-type">$paragraph or $p type</h2>
+<p>Exactly like $text but create a paragraph.</p>
+<p><strong>TODO: Document parameters</strong></p>
+<h2 id="-image-or-i-type">$image or $i type</h2>
+<p>Embeds an image, no options only needed for animated gifs or to link to external content</p>
+<p>Default width is 2m, and height is fixed by aspect ratio of the image data, create your placeholder to fit that size and then scale instances to resize the image.</p>
+<p>Example:</p>
+<blockquote>
+<p>$i|<a href="http://example.com/image.png">http://example.com/image.png</a></p>
+</blockquote>
+<h2 id="-video-or-v-type">$video or $v type</h2>
+<p>Embeds a video, can specify thumbnail.</p>
+<p>Default width is 2m, and height is fixed by aspect ratio of thumbnail/video file, create you placeholder/prop to fit that size and then scale instances to resize the video.</p>
+<p>So, if you wanted to have a 4x3 video in your room, create a TV model with a 4x3 screen which is to meters wide and the components origin in the center of the screen. You can then position instances of that component with any size and the video should fit.</p>
+<p>Example:</p>
+<blockquote>
+<p>$v|thumb=images/thumb.jpg|<a href="http://example.com/video.mp4">http://example.com/video.mp4</a></p>
+</blockquote>
+<h2 id="-nosolid">$nosolid</h2>
+<p><em>This is deprecated append &#39;+&#39; to the name of the component to create non-solid objects&#39;</em></p>
+<p>Create an instance of a model but do not use the geometry for collision detection. This is very important for high poly models.</p>
+<h1 id="lighting-types">Lighting Types</h1>
+<h2 id="-ambient">$ambient</h2>
+<p>Set the ambient lighting level for the room</p>
+<p>Example, dimly lit room:</p>
+<blockquote>
+<p>$ambient|0.2 0.2 0.2</p>
+</blockquote>
+<h2 id="-directional">$directional</h2>
+<p>Like ambient light, but will shade face based on there orientation to the light source.</p>
+<p>See tut_image.skp for usage.</p>
+<h2 id="-light">$light</h2>
+<p>This is your basic lighting element, a point light that casts light in all direction.</p>
+<p><strong>TODO: Document parameters</strong></p>
+<h2 id="-spotlight">$spotlight</h2>
+<p>Directional spotlight, light will be case along the green axis of the component</p>
+<p><strong>TODO: Document parameters</strong></p>
+

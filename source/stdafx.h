@@ -22,6 +22,7 @@
 #include <slapi/unicodestring.h>
 #include <slapi/model/model.h>
 #include <slapi/model/entities.h>
+#include <slapi/model/entity.h>
 #include <slapi/model/face.h>
 #include <slapi/model/edge.h>
 #include <slapi/model/mesh_helper.h>
@@ -31,6 +32,9 @@
 #include <slapi/model/component_instance.h>
 #include <slapi/model/component_definition.h>
 #include <slapi/model/group.h>
+#include <slapi/model/image.h>
+#include <slapi/model/drawing_element.h>
+#include <slapi/model/texture_writer.h>
 
 
 #include <map>

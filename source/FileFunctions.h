@@ -16,13 +16,20 @@ bool fileCopy(const string& src, const string& dest);
 
 string executablePath();
 
+inline string tempDir() {
+
+	char buffer[MAX_PATH];
+	GetTempPathA(MAX_PATH, buffer);
+	return buffer;
+}
+
 inline string sdkDir() {
 	string exe = executablePath();
 	return stringReplace(stringReplace(exe,"\\bin\\sketchup2room.exe",""),"/bin/sketchup2room","");
 }
 
 inline string fileName(const string& path) {
-    int i = path.find_last_of('/');
+    int i = path.find_last_of("/\\");
     return (i==-1) ? path : path.substr(i+1);
 }
 
