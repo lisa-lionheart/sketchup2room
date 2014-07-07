@@ -6,7 +6,7 @@ A tool for creating VR "rooms" from google SketchUp files.
 This utility will take a SketchUp .skp file and create a complete set of .obj and html files that make up a JanusVR room.
 
 
-[Check out the VR now to see it in action](janus://static.croxford.me/VRSite/)
+[Check out the VR now to see it in action](http://static.croxford.me/VRSite/)
 
 [Documentation in the docs Folder](docs/index.md)
 
