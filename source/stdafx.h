@@ -34,6 +34,7 @@
 #include <slapi/model/group.h>
 #include <slapi/model/image.h>
 #include <slapi/model/drawing_element.h>
+#include <slapi/model/texture_writer.h>
 
 
 #include <map>

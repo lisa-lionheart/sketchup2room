@@ -6,9 +6,8 @@ int g_Debug = 0;
 void main()
 {
 	//Clip plane check
-	if (iUseClipPlane == 1 && dot(iPosition, iClipPlane.xyz) < iClipPlane.w) {
+	if (iUseClipPlane == 1 && dot(iPositionWorld, iClipPlane.xyz) < iClipPlane.w) {
 		discard;
-		return;
 	}
 	
 	vec4 ka = gl_FrontMaterial.ambient;
@@ -28,6 +27,7 @@ void main()
 	if(kd.a < 0.1) {
 		discard;
 	}
+
 	applySceneLights();
     
 	vec3 col = kd.rgb * (diffuseLight + ambientLight + ka.rgb) + (ks.rgb * specularLight);

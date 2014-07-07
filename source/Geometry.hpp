@@ -23,6 +23,8 @@ extern const SUVector3D xaxis;
 extern const SUVector3D yaxis;
 extern const SUVector3D zaxis;
 
+extern const SUPoint3D NullPos;
+
 inline Transform operator*(const Transform& a, const Transform& b) {
 	Transform r;
 	int i,j;
@@ -89,8 +91,7 @@ inline double length(const SUVector3D& v) {
 	return sqrtf((v.x*v.x) + (v.y*v.y) + (v.z*v.z));
 }
 
-inline ostream& writeTransform(ostream& html, Transform t, bool flipYZ = false){
-	SUPoint3D pos = { 0 };
+inline ostream& writeTransform(ostream& html, Transform t, bool flipYZ = true, SUPoint3D pos = NullPos){
 
 	html << "pos=\""  << (pos * t) / g_Scale << "\" "; 
 	html << "xdir=\"" << xaxis*t << "\" "; 

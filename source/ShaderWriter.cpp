@@ -5,8 +5,6 @@
 
 string shaderDir() {
 	return sdkDir() + "/shaders";
-
-
 }
 
 ShaderWriter::ShaderWriter(const string& outFile) {
@@ -105,9 +103,9 @@ void ShaderWriter::writeLights(const vector<InstanceInfo>& instances) {
 
 	for(size_t i = 0; i < instances.size(); i ++) {
 
-		InstanceInfo& light = *const_cast<InstanceInfo*>(&instances[i]);
+		const InstanceInfo& light = instances[i];
         
-        if(light.type != "light" && light.type != "spotlight" && light.type != "ambient")
+        if(light.type != "light" && light.type != "spotlight" && light.type != "ambient" && light.type != "directional")
             continue;
         
 		SUVector3D colour = { 1, 1, 1 };
@@ -124,72 +122,46 @@ void ShaderWriter::writeLights(const vector<InstanceInfo>& instances) {
         
         string colourExpr = vec3string(colour);
         
-        float range = 20.0;
-        float falloff = 2.0;
+        float range = (float)atof(light.getAttribute("range", "20.0").c_str());
+        float falloff = (float)atof(light.getAttribute("falloff", "2.0").c_str());
         
+		
+		SUVector3D dir = yaxis * light.transform;
+
 		SUPoint3D pos = {0};
 		pos = (pos * light.transform) / g_Scale;
         string posExpr = vec3string(pos);
-        
-        
-        if(light.attributes["range"] != "") {
-            range = (float)atof(light.attributes["range"].c_str());
-        }
-        
-        if(light.attributes["falloff"] != "") {
-            falloff = (float)atof(light.attributes["falloff"].c_str());
-        }
+		string func = light.getAttribute("func",light.type);
 
+		if(light.hasAttribute("cond")) {
+			string cond = stringReplace(light.getAttribute("cond"),"$POS",posExpr);
+            m_Shader << "if(" << cond << ") ";
+		}
 
 		if(light.type == "ambient") {
 			m_Shader << "ambientLight = " << colourExpr << ";";
-			if(m_Debug) m_Shader << endl;
 		}
 
 		if(light.type == "spotlight") {
 
-			float outerCone = 40;
-            if(light.attributes["outerCone"] != "") {
-                outerCone = (float)atoi(light.attributes["outerCone"].c_str());
-            }
-            
+			float outerCone = (float)atoi(light.getAttribute("outerCone", "40").c_str());
 			float innerCone = outerCone - 0.5;
-            if(light.attributes["innerCone"] != "") {
-                outerCone = (float)atoi(light.attributes["innerCone"].c_str());
+            if(light.hasAttribute("innerCone")) {
+                outerCone = (float)atoi(light.getAttribute("innerCone").c_str());
             }
             
-			SUVector3D dir = yaxis * light.transform;
-            
-			string func = "spotlight";
-			if(light.attributes["func"] != "") {
-				func = light.attributes["func"];
-			}
-            
-			if(light.attributes["cond"] != "") {
-				string cond = stringReplace(light.attributes["cond"],"$POS",posExpr);
-                m_Shader << "if(" << cond << ") ";
-			}
+            m_Shader << func << "(" << posExpr << "," << vec3string(dir) << "," << colourExpr<< "," << outerCone << "," << innerCone << "," << range << "," << falloff << ");";
+		}
 
-			m_Shader << func << "(" << posExpr << "," << vec3string(dir) << "," << colourExpr<< "," << outerCone << "," << innerCone << "," << range << "," << falloff << ");";
-			if(m_Debug) m_Shader << endl;
+		if(light.type == "directional") {
+            m_Shader << func << "(" << vec3string(dir) << "," << colourExpr << ");";
 		}
 
 		if(light.type == "light") {
-				
-			string func = "pointlight";
-			if(light.attributes["func"] != "") {
-				func = light.attributes["func"];
-			}
-            
-			if(light.attributes["cond"] != "") {
-				string cond = stringReplace(light.attributes["cond"],"$POS",posExpr);
-                m_Shader << "if(" << cond << ") ";
-			}
-
 			m_Shader << func << "(" << posExpr << "," << colourExpr << ",0.00,"<<range<<"," << falloff << ");";
-			if(m_Debug) m_Shader << endl;
 		}
-
+	
+		if(m_Debug) m_Shader << endl;
 	}
 	
 	m_Shader << "}";

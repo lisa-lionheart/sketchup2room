@@ -9,10 +9,24 @@ struct InstanceInfo {
 	string modelId;
 
 	string type;
-	map<string,string> attributes;
+
+	map<string,string> attributes; 
 	string value;
 
+	SUPoint3D offset;
     SUTextureRef texture;
+
+	bool hasAttribute(const string& name) const {
+		return attributes.find(name) != attributes.end();
+	}
+
+	string getAttribute(const string& name, const string& def = "") const {
+		map<string,string>::const_iterator itr = attributes.find(name);
+		if(itr == attributes.end()){
+			return def;
+		}
+		return itr->second;
+	}
 };
 
 class SketchupHelper
@@ -28,7 +42,11 @@ class SketchupHelper
 	bool parseInstanceName(const string& name, /*out*/ InstanceInfo& meta);
     
 	void getInstancesRecursive(SUEntitiesRef ents, Transform = BaseTransform);
+	void extractInstances(SUEntitiesRef ents, const Transform& parentTransform);
+	void extractImages(SUEntitiesRef ents, const Transform& parentTransform);
     
+	string extractImageToFile(SUImageRef);
+
 public:
     SketchupHelper();
     

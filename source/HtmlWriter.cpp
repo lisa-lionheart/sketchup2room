@@ -5,22 +5,13 @@
 #include "ModelWriter.h"
 
 
-HtmlWriter::HtmlWriter(const string& outDir, const string& fileName)
+HtmlWriter::HtmlWriter(const Config& config) : m_Config(config)
 {
-    
-    
     m_RoomAtributes["draw_glow"] = "false";
     m_RoomAtributes["default_sounds"] = "false";
     m_RoomAtributes["col"] = "0 0 0";
-    
-	m_Title = baseName(fileName);
-	m_FileName = fileName;
-	m_OutputDir = outDir;
-	m_Origin = BaseTransform;
 
-	m_Html.open(outDir + fileName);
-	m_Html.precision(3);
-	m_Html.setf( std::ios::fixed, std:: ios::floatfield );
+	m_Origin = BaseTransform;
 }
 
 
@@ -34,25 +25,58 @@ void HtmlWriter::addAsset(const string &assetTag) {
 
 void HtmlWriter::setDefaultShader(const string &s) {
     addAsset("<AssetShader id=\"default_shader_id\" src=\"" + s + "\"/>");
-    m_DefaultShaderId = "shader_id=\"default_shader_id\" ";
+    m_DefaultShaderId = "default_shader_id";
 }
 
 void HtmlWriter::writeAssets( const vector<InstanceInfo>& instances) {
-
-    
+	m_Output << "<AssetObject id=\"object_hull\" src=\"" << m_Config.roomName << ".obj\" mtl=\"" << m_Config.roomName <<".mtl\" />" << endl;
+			
     set<string>::iterator itr = m_Assets.begin();
     while(itr != m_Assets.end()) {
-        
-        m_Html << *itr << endl;
-        
+        m_Output << *itr << endl;
         itr++;
     }
 }
 
+void HtmlWriter::writeRoomTag(const vector<InstanceInfo>& instances) {
+	
+	m_Output << "<Room ";
+	map<string,string>::iterator itr= m_RoomAtributes.begin();
+    while(itr != m_RoomAtributes.end()) {
+        m_Output << itr->first << "=\"" << itr->second << "\" ";
+        itr++;
+    }
+    m_Output << m_Origin << ">" << endl;
 
+	m_Output << "<Object id=\"object_hull\" collision_id=\"object_hull\"";
+	m_Output << " shader_id=\"" << m_DefaultShaderId << "\"";
+	m_Output << " locked=\"true\" "<< TransformIdentity<<" />" << endl;
+	
+	for(size_t i=0; i < instances.size(); i++) 
+		writeInstance(instances[i]);
+	
+	m_Output << "</Room>" << endl;
+}
 
 bool HtmlWriter::write(const vector<InstanceInfo>& instances) {
+	  
+	m_Title = baseName(m_Config.roomName);
+
+	ifstream templateFile;
+
+	templateFile.open(m_Config.templateName);
+
+	if(!templateFile.good()) 
+		templateFile.open(sdkDir() + "/html/" + m_Config.templateName);
 	
+	if(!templateFile.good()) {
+		cerr << "Could not open template file" << endl;
+		return false;
+	}
+
+	m_Output.open(m_Config.outputDir + m_Config.outputHtml);
+	m_Output.precision(3);
+	m_Output.setf( std::ios::fixed, std:: ios::floatfield );
     
 	for(size_t i=0; i < instances.size(); i++) {
 
@@ -66,172 +90,160 @@ bool HtmlWriter::write(const vector<InstanceInfo>& instances) {
 	cout << "Writing room HTML" << endl;
 
 
-	m_Html << "<html>" << endl;
-	m_Html << "<head>" << endl;
-	m_Html << "<title>" << m_Title << "</title>" << endl;
-	m_Html << "</head>" << endl;
-	m_Html << "<body>" << endl;
-	m_Html << "<p>Put your goggles on ;)</p>" << endl;
-	m_Html << "<!--" << endl;
-	m_Html << "<FireBoxRoom>" << endl;
-	m_Html << "<Assets>" << endl;
-	m_Html << "<AssetObject id=\"object_hull\" src=\"" << baseName(m_FileName) << ".obj\" mtl=\"" << baseName(m_FileName) <<".mtl\" />" << endl;
-	
-	writeAssets(instances);
+	while(!templateFile.eof()) {
 
-	m_Html << "</Assets>" << endl;
-	m_Html << "<Room  ";
-    map<string,string>::iterator itr= m_RoomAtributes.begin();
-    while(itr != m_RoomAtributes.end()) {
-        m_Html << itr->first << "=\"" << itr->second << "\" ";
-        itr++;
-    }
-    
-	writeTransform(m_Html,m_Origin,true) << ">" << endl;
-	m_Html << "<Object id=\"object_hull\" collision_id=\"object_hull\" "<<m_DefaultShaderId<<"locked=\"true\" "<<BaseTransform<<" />" << endl;
-	
-	for(size_t i=0; i < instances.size(); i++) {
-		writeObject(instances[i]);
+		char buffer[300];
+		templateFile.getline(buffer,sizeof(buffer));
+
+		if(strcmp(buffer,"%ROOM_TITLE%") == 0) {
+			m_Output << "<title>" << m_Title << "</title>" << endl;
+			continue;
+		}
+		
+		if(strcmp(buffer,"%ASSETS%") == 0) {
+			writeAssets(instances);
+			continue;
+		}
+
+		if(strcmp(buffer,"%ROOM_HTML%") == 0) {
+			writeRoomTag(instances);
+			continue;
+		}
+
+		m_Output << buffer << endl;
 	}
-	
-	m_Html << "</Room>" << endl;
-	m_Html << "</FireBoxRoom>" << endl;
-	m_Html << "-->" << endl;
-	m_Html << "</body>" << endl;
-	m_Html << "</html>" << endl;
 
-	m_Html.close();
+	m_Output.close();
 
 	cout << "HTML Finished" << endl;
 
 	return true;
 }
 
+void HtmlWriter::writeObjectTag(const InstanceInfo& obj) {
 
-
-void HtmlWriter::writeObject(const InstanceInfo& _obj) {
-
-	InstanceInfo& obj = *const_cast<InstanceInfo*>(&_obj);
-
-	if(obj.modelName[0] != '!'){
-		m_Html << "<Object id=\"" << obj.modelId << "\" "<< m_DefaultShaderId <<"locked=\"true\" ";
+	m_Output << "<Object id=\"" << obj.modelId << "\" ";
+	m_Output << " shader_id=\"" << obj.getAttribute("shader",m_DefaultShaderId) << "\"";
+	m_Output << " locked=\"true\" ";
 		
-		if(obj.type != "nonsolid") {
-			m_Html << "collision_id=\"" << obj.modelId <<"\" ";
-		}
-
-		if(obj.attributes["rotate_speed"] != ""){
-
-			string axis="0 0 1";
-			if(obj.attributes["rotate_axis"] != "") {
-				axis = obj.attributes["rotate_axis"];
-			}
-
-			m_Html << "rotate_deg_per_sec=\"" << obj.attributes["rotate_speed"] << "\" rotate_axis=\"" << axis << "\" ";
-		}
-		
-		m_Html << obj.transform << " scale=\"" << getTransformScale(obj.transform) << "\"/>" << endl;
+	if(obj.type != "nonsolid" && obj.modelName[0] != '+' ) {
+		m_Output << " collision_id=\"" << obj.modelId <<"\" ";
 	}
 
-	if(obj.type == "link"){
-
-		m_Html << "<Link url=\"" << obj.value << "\" ";
-			
-		if(obj.attributes["noglow"] == "true") {
-			m_Html << "draw_glow=\"false\" ";
-		}
-
-		if(obj.attributes["autoload"] == "true") {
-			m_Html << "auto_load=\"true\" ";
-		}
-
-		if(obj.attributes["notext"] == "true"){
-			m_Html << "draw_text=\"false\" ";
-		}
-
-		if(obj.attributes["title"] != ""){
-			m_Html << "title=\""<<obj.attributes["title"]<<"\" ";
-		}
-        
-        if(obj.attributes["col"] != ""){
-            m_Html << "col=\"" << obj.attributes["col"]<<"\" ";
-        }
-        
-        if(obj.attributes["thumb"] != ""){
-          m_Html << "thumb_id=\"" << obj.attributes["thumb"]  << "\" ";
-        }
-        
-        
-        if(obj.attributes["size"] != "") {
-            m_Html << "scale=\"" << obj.attributes["size"] << " 1\" ";
-        }else {
-            m_Html << "scale=\"1.8 2.5 1\" ";
-        }
-		writeTransform(m_Html,obj.transform,true) << "/>" << endl;
+	if(obj.hasAttribute("rotate_speed")){
+		m_Output << " rotate_deg_per_sec=\"" << obj.getAttribute("rotate_speed") << "\" rotate_axis=\"" << obj.getAttribute("rotate_axis", "0 0 1") << "\" ";
 	}
 
-	if(obj.type == "text" || obj.type == "paragraph"){
-			
-		if(obj.type == "text") {
-			m_Html << "<Text ";
-		} else {
-			m_Html << "<Paragraph ";
-		}
+	writeTransform(m_Output, obj.transform, false);
+	m_Output << " scale=\"" << getTransformScale(obj.transform) << "\"/>" << endl;
+}
 
-		m_Html << m_DefaultShaderId;
-
-
-		if(obj.attributes["font_size"] != ""){
-			m_Html << "font_size=\""<<obj.attributes["font_size"]<<"\" ";
-		}
-
-		if(obj.attributes["col"] != ""){
-			m_Html << "col=\""<<obj.attributes["col"]<<"\" ";
-		}
-
-		if(obj.attributes["text_col"] != ""){
-			m_Html << "text_col=\""<<obj.attributes["text_col"]<<"\" ";
-		}
-
-		if(obj.attributes["back_col"] != ""){
-			m_Html << "back_col=\""<<obj.attributes["back_col"]<<"\" ";
-		}
-		if(obj.attributes["back_alpha"] != ""){
-			m_Html << "back_alpha=\""<<obj.attributes["back_alpha"]<<"\" ";
-		}
-
-		writeTransform(m_Html,obj.transform,true) << " scale=\"" << getTransformScale(obj.transform) << "\" >";
-		m_Html << obj.value;
-		if(obj.type == "text") {
-			m_Html << "</Text>" << endl;
-		} else {
-			m_Html << "</Paragraph>" << endl;
-		}
- 	}
-    
-    if(obj.type == "sound") {
-        m_Html << "<Sound id=\"" << obj.value << "\" rect=\"-100 -100 100 100\"";
-		
-		if(obj.attributes["loop"] == "true") {
-			m_Html << " loop=\"true\"";
-		}
-
-		m_Html << " />" << endl;
-    }
-    
-    if(obj.type == "video") {
-        
-        float width = length(yaxis * obj.transform);
-        float height = length(zaxis * obj.transform);
-        m_Html << "<Video id=\"" << obj.value << "\" ";
-		writeTransform(m_Html,obj.transform,true) <<" scale=\"" << width << " " << height << " 1\" />" << endl;
-    }
-    
-    if(obj.type == "image") {
-        
-        m_Html << "<Image id=\"" << obj.value << "\" ";
-		writeTransform(m_Html,obj.transform,true) <<" />" << endl;
-        
-    }
+void HtmlWriter::writeLinkTag(const InstanceInfo& obj) {
 	
+	m_Output << "<Link url=\"" << obj.value << "\" ";
+			
+	if(obj.hasAttribute("noglow")) {
+		m_Output << "draw_glow=\"false\" ";
+	}
+
+	if(obj.hasAttribute("autoload")) {
+		m_Output << "auto_load=\"true\" ";
+	}
+
+	if(obj.hasAttribute("notext")) {
+		m_Output << "draw_text=\"false\" ";
+	}
+
+	if(obj.hasAttribute("title")) {
+		m_Output << "title=\""<<obj.getAttribute("title")<<"\" ";
+	}
+        
+    if(obj.hasAttribute("col")) {
+		m_Output << "col=\"" << obj.getAttribute("col", "1 1 1")<<"\" ";
+	}
+        
+    if(obj.hasAttribute("thumb")) {
+        m_Output << "thumb_id=\"" << obj.getAttribute("thumb")  << "\" ";
+    }
+        
+	m_Output << obj.transform << "scale=\"" << obj.getAttribute("size","1.8 2.5") << " 1\" />" << endl;
+}
+
+void HtmlWriter::writeTextTag(const InstanceInfo& obj) {
+
+	m_Output << (obj.type == "text" ?  "<Text " :"<Paragraph ")  << endl;
+	m_Output << "shader_id=\"" << obj.getAttribute("shader",m_DefaultShaderId) << "\" ";
+
+	if(obj.hasAttribute("font_size")){
+		m_Output << "font_size=\""<<obj.getAttribute("font_size")<<"\" ";
+	}
+
+	if(obj.hasAttribute("col")){
+		m_Output << "col=\""<<obj.getAttribute("col")<<"\" ";
+	}
+
+	if(obj.hasAttribute("text_col")){
+		m_Output << "text_col=\""<<obj.getAttribute("text_col")<<"\" ";
+	}
+
+	if(obj.hasAttribute("back_col")){
+		m_Output << "back_col=\""<<obj.getAttribute("back_col")<<"\" ";
+	}
+	if(obj.hasAttribute("back_alpha")){
+		m_Output << "back_alpha=\""<<obj.getAttribute("back_alpha")<<"\" ";
+	}
+
+	SUPoint3D pos = { 0.0f, -3.5f, 0.0f };
+	writeTransform(m_Output,obj.transform,true, pos);
+
+	m_Output << " scale=\"" << getTransformScale(obj.transform) << "\" >";
+	m_Output << obj.value;
+	m_Output << (obj.type == "text" ?  "</Text>" :"</Paragraph>")  << endl;
+}
+
+VOID HtmlWriter::writeImageTag(const InstanceInfo& obj) {
+        
+    m_Output << "<Image id=\"" << obj.value << "\" ";
+	writeTransform(m_Output,obj.transform, false, obj.offset);
+	
+	m_Output << "shader_id=\"" << obj.getAttribute("shader",m_DefaultShaderId) << "\" ";
+
+	if(obj.hasAttribute("scale")) {
+		m_Output << "scale=\"" << obj.getAttribute("scale") << "\" ";
+	} else {
+	
+		m_Output << "scale=\"" << length(xaxis*obj.transform) << " " << length(yaxis*obj.transform) << " 0\" ";
+	}
+
+	m_Output <<" />" << endl;    
+}
+
+void HtmlWriter::writeSoundTag(const InstanceInfo& obj) {
+
+    m_Output << "<Sound id=\"" << obj.value << "\" rect=\"-100 -100 100 100\"";
+	m_Output << " loop=\"" << obj.getAttribute("loop","false") << "\"";
+	m_Output << " />" << endl;
+}
+
+void HtmlWriter::writeVideoTag(const InstanceInfo& obj) {
+	double width = length(xaxis * obj.transform);
+	double height = length(yaxis * obj.transform);
+	m_Output << "<Video id=\"" << obj.value << "\" " << obj.transform << " ";
+	
+	if(obj.hasAttribute("thumb")) {
+		m_Output << "thumb_id=\"" << obj.getAttribute("thumb") << "\" ";
+	}
+
+	m_Output << "scale=\"" << width << " " << height << " " << width << "\" />" << endl;
+}
+
+
+void HtmlWriter::writeInstance(const InstanceInfo& obj) {
+
+	if(obj.modelName[0] != '!') writeObjectTag(obj);
+	if(obj.type == "link") writeLinkTag(obj);
+	if(obj.type == "text" || obj.type == "paragraph") writeTextTag(obj);
+	if(obj.type == "sound") writeSoundTag(obj);
+    if(obj.type == "video") writeVideoTag(obj);
+    if(obj.type == "image") writeImageTag(obj);
 }
