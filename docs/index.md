@@ -9,7 +9,7 @@ Quick start
 ---------------
 
 1. Create and save your SketchUp file in the "workspace" folder
-2. Double click on build.cmd, you html will be created in a directory called build
+2. Double click on build.cmd, your html will be created in a directory called build
 3. When you make changes delete the build folder and run build.cmd again
 
 How to compose your SketchUp file for use with sketchup2room
@@ -31,16 +31,18 @@ Please check out the examples skp files, to see how this works in practice.
 Default Material
 -----
 
-Sketchup2room will cull faces that have the Default Material, to make sure faces are exported apply a material to them
+Sketchup2room will cull faces that have the Default Material, so make sure faces are exported apply a material to them
 
 Making dynamic objects.
 =====
 
 By setting a name on individual instances of components you can tell sketchup2room to set the location of the entrance portal and create links to new rooms.
 
-The format is, where the pipe character "|" separates sections:
+The format is as follows, where the pipe character "|" separates sections:
 
 > $type|option1,option2=value|Text or URL
+
+Note that RGB values or width and height are space delimited and range from 0 to 1, e.g.: col=.2 .5 .3
 
 $origin type
 ----
@@ -57,27 +59,45 @@ Simple:
 
 Advanced:
 
-> $link|noglow,notext|room3.html
+> $link|title=ROOM 3,noglow,notext,autoload,col=.5 .5 .5,thumb=door.jpg,size=1 2.2|room3.html
 
-**TODO: Document parameters**
+
+Creates a portal to a JanusVR room.
+
+Optional Parameters:
+* title - Sets the title of the link (e.g. title=Tutorial Room)
+* noglow - Turns off the glow effect that normally indicates a clickable portal
+* notext - Draws no text on the door
+* autoload - Automatically loads the destination room, as though the link has been clicked
+* col - Sets the color of the glow effect using RGB values
+* thumb - The Path to the thumbnail to be used as the door image
+* size - Sets the size (width height) of the portal.  Default is 1.8 2.5.
+
 
 $text or $t type
 -----
 
 Creates a text element at the given position.
 
-Example:
+Simple:
 
 > $text|text_col=1 1 1|JanusVR is cool
 
-**TODO: Document parameters**
+Advanced:
+> $text|font_size=20,back_alpha=0.5,back_col=0.5 0 0,text_col=1 1 1|Welcome to My Room
+
+Optional Parameters:
+* font_size - the point font size of the text
+* back_alpha - the alpha value of the background color, where 0 = transparent and 1 = opaque
+* back_col - the color value of the background. R G B values from 0 to 1
+* text_col - the color value of the text. R G B values from 0 to 1
+
 
 $paragraph or $p type
 -----
 
 Exactly like $text but create a paragraph.
 
-**TODO: Document parameters**
 
 
 $image or $i type
@@ -97,9 +117,9 @@ $video or $v type
 
 Embeds a video, can specify thumbnail.
 
-Default width is 2m, and height is fixed by aspect ratio of thumbnail/video file, create you placeholder/prop to fit that size and then scale instances to resize the video.
+Default width is 2m, and height is fixed by aspect ratio of thumbnail/video file, create your placeholder/prop to fit that size and then scale instances to resize the video.
 
-So, if you wanted to have a 4x3 video in your room, create a TV model with a 4x3 screen which is to meters wide and the components origin in the center of the screen. You can then position instances of that component with any size and the video should fit.
+If you wanted to have a 4x3 video in your room, create a TV model with a 4x3 screen which is 2 meters wide and the components origin in the center of the screen. You can then position instances of that component with any size and the video should fit.
 
 
 Example:
@@ -130,9 +150,11 @@ Example, dimly lit room:
 $directional
 --------
 
-Like ambient light, but will shade face based on there orientation to the light source.
+Like ambient light, but will shade face based on there orientation to the light source.  Direction is indicated by the green axis of the component.
 
-See tut_image.skp for usage.
+> $directional|0.2 0.2 0.2
+
+See tut_image.skp for an example.
 
 
 $light
@@ -140,11 +162,21 @@ $light
 
 This is your basic lighting element, a point light that casts light in all direction.
 
-**TODO: Document parameters**
+Optional Parameters:
+
+* func - Sets the type of light. Default value is pointlight. Using torchlight will make a flickering light
+* range - Maximum distance (meters) to apply the light. Default is 20. To increase performance, set this to the minimum that does not cause graphical artifacts.  Shorter distances can create interesting effects.
+* falloff - Specifies the falloff power factor, where 1=1/x, 2 = 1/(x^2), 3 = 1/(x^3), and so on.
+* cond - Allows you to enable or disable the light with some custom condition. Takes a GLSL expression.
+
+> $light|func=torchlight|2 1.5 0.6
 
 $spotlight
 ------
 
 Directional spotlight, light will be case along the green axis of the component
 
-**TODO: Document parameters**
+Optional Parameters:
+Takes all the parameters of $light, plus
+* outerCone - The angle in degrees that the light is emitted from the spot light.  Default is 40
+* innerCone - The angle in degrees that receives maximum intensity. There will be a gradual fall off from this to the outerCone. Default is outerCone-2
