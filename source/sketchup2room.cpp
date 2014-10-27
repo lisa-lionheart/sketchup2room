@@ -14,12 +14,14 @@ bool SketchUp2Room::parseArguments(int argc, char* argv[]) {
 		cerr << "sketchup2room: Converts a sketchup file into an OBj file that you can use with the JanusVR browser" << endl;
 		cerr << "Arguments:  sketchup2room <options> filename" << endl << endl;
 		cerr << "Options:" << endl;
-		cerr << " --out <filename>          Set the output directory" << endl;
+		cerr << " --aout <filename>         Set the output directory full path" << endl;
+		cerr << " --out <filename>          Set the output directory relative to the current directory" << endl;
 		cerr << " --html <filename>         Generate a generic firebox HTML file" << endl;
 		return false;
 	}
 
-	m_Config.outputDir = currentDir();
+	string originalDirectory = currentDir();
+	m_Config.outputDir = originalDirectory;
 	m_Config.force = false;
 	m_Config.shader = "default.fs";
 	m_Config.templateName = "default.templ";
@@ -28,11 +30,27 @@ bool SketchUp2Room::parseArguments(int argc, char* argv[]) {
 		string arg = argv[i];
         
 		if(arg == "--out"){
-			m_Config.outputDir = currentDir() + "/" + string(argv[++i]) + "/";
+		    if (m_Config.outputDir != originalDirectory)
+		    {
+                        cerr << "--out and --aout options are exclusive options and cannot be used together and more than one time: " << arg << endl;
+                        return true;
+                    }
+		    m_Config.outputDir = currentDir() + "/" + string(argv[++i]) + "/";
 			makeDir(m_Config.outputDir);
 			continue;
 		}
-		
+                
+		if (arg == "--aout"){
+		    if (m_Config.outputDir != originalDirectory)
+		    {
+                        cerr << "--out and --aout options are exclusive options and cannot be used together and more than one time: " << arg << endl;
+                        return true;
+                    }
+		    m_Config.outputDir = string(argv[++i]) + "/";
+		    makeDir(m_Config.outputDir);
+		    continue;
+		}
+
 		if(arg == "--html") {
 			m_Config.outputHtml = argv[++i];
 			continue;
